@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="header_profile">Профиль</title>
+    <link rel="stylesheet" href="static/profile.css" />
+    <link rel="icon" type="image/png" href="static/img/logosite.svg?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+
+<!-- Header -->
+<header class="header">
+    <div class="container header-inner">
+
+  <!-- Бургер-кнопка -->
+<div id="burger-button" class="burger">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<div class="mobile-overlay">
+  <div class="mobile-menu">
+    <nav class="mobile-nav">
+     <a href="#about" data-i18n="header_about">О софте</a>
+            <a href="#advantages" data-i18n="header_risks">Виды риска</a>
+            <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+            <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
+    </nav>
+  </div>
+</div>
+
+
+
+
+        <a href="/" class="logo-link">
+            <img src="/static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+        </a>
+        <nav class="nav">
+            <a href="#about" data-i18n="header_about">О софте</a>
+            <a href="#advantages" data-i18n="header_risks">Виды риска</a>
+            <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+            <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
+        </nav>
+        <div class="header-actions">
+            {% if request.cookies.get("user_email") %}
+            <a href="/profile" class="contact-btn profile-btn" data-i18n="header_profile">Профиль<img src="/static/img/UserAddOutlined.svg" alt="Profile" /></a>
+            {% else %}
+            <a href="/auth" class="contact-btn profile-btn" data-i18n="header_register">Зарегистрироваться<img src="/static/img/UserAddOutlined.svg" alt="Telegram" /></a>
+            {% endif %}
+            <div class="language-icons">
+                <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+                <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+                <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Профиль -->
+<main class="profile">
+    <div class="profile-top">
+        <img src="/static/img/UserAvatar.svg" alt="User Icon" class="avatar" />
+        <p><span data-i18n="welcome">Добро пожаловать,</span> {{user.login}}</p>
+        <button class="logout" id="logout-btn" data-i18n="logout">Выйти</button>
+    </div>
+
+    <div class="profile-tabs">
+        <button class="tab-btn active" data-tab="dashboard" data-i18n="dashboard">Дашборд</button>
+        <button class="tab-btn" data-tab="reset" data-i18n="reset">Сброс пароля</button>
+        <button class="tab-btn disabled" disabled data-i18n="referral">Реф. система</button>
+    </div>
+
+    <div class="tab-content active" id="dashboard">
+        <form id="profile-form" class="form-grid">
+            <div class="form-column">
+                <label data-i18n="your_login">Ваш логин</label>
+                <input type="text" value="{{ user.login }}" disabled />
+
+                <label data-i18n="your_email">Ваша почта</label>
+                <input type="email" value="{{ user.email }}" disabled />
+
+                <label data-i18n="your_trader_id">Ваш трейдер ID</label>
+                <input type="text" value="{{ user.trader_id }}" disabled />
+            </div>
+
+            <div class="form-column">
+                <label data-i18n="personal_phone">Личный номер телефона (необязательно)</label>
+                <input type="text" id="phone-personal" />
+
+                <label data-i18n="work_phone">Рабочий номер телефона (необязательно)</label>
+                <input type="text" id="phone-work" />
+
+                <label data-i18n="country_city">Страна, город (необязательно)</label>
+                <input type="text" id="location" />
+            </div>
+
+            <div class="button-container">
+                <button type="submit" class="save-btn" data-i18n="save_btn">Сохранить данные</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="tab-content" id="reset">
+        <p data-i18n="reset_text">
+            Чтобы изменить пароль, отправьте запрос на ваш email.<br>
+            Вы получите ссылку для сброса пароля.
+        </p>
+        <input type="email" placeholder="user@example.com" />
+        <button class="save-btn" data-i18n="send_link">Отправить ссылку</button>
+    </div>
+
+    <div class="tab-content" id="referral">
+        <p data-i18n="referral_soon">Скоро</p>
+    </div>
+</main>
+
+<script src="/static/js/profile.js?v=3"></script>
+
+</body>
+</html>

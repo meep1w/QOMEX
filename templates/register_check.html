@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Проверка трейдер ID</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" href="static/img/logosite.svg?v=1">
+  <link rel="stylesheet" href="/static/register_check.css" />
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-container header-inner">
+
+      <!-- Бургер (мобилка) -->
+      <button id="burger-button" class="burger" aria-label="Открыть меню" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- Лого по центру -->
+      <a href="/" class="logo-link" aria-label="QOMEX Home">
+        <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+      </a>
+
+      <!-- Навигация (ПК) -->
+      <nav class="nav" role="navigation" aria-label="Главная навигация">
+        <a href="/#about" data-i18n="header_about">О софте</a>
+        <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+        <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+        <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+      </nav>
+
+      <!-- Правая часть: Профиль/Регистрация (ПК) + языки -->
+      <div class="header-right">
+        {% if request.cookies.get("user_email") %}
+        <a href="/profile" class="contact-btn desktop-only">
+          <span data-i18n="header_profile">Профиль</span>
+
+        </a>
+        {% else %}
+        <a href="/auth" class="contact-btn desktop-only">
+          <span data-i18n="header_register">Зарегистрироваться</span>
+
+        </a>
+        {% endif %}
+
+        <div class="language-icons">
+          <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+          <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+          <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
+        </div>
+      </div>
+    </div>
+
+    <!-- Мобильное меню (с кнопкой Профиль/Регистрация) -->
+    <div class="mobile-overlay" id="mobile-overlay">
+      <div class="mobile-menu">
+        <nav class="mobile-nav" aria-label="Мобильное меню">
+          <a href="/#about" data-i18n="header_about">О софте</a>
+          <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+          <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+          <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+
+          {% if request.cookies.get("user_email") %}
+            <a href="/profile" >
+              <span data-i18n="header_profile">Профиль</span>
+            </a>
+          {% else %}
+            <a href="/auth" >
+
+              <span data-i18n="header_register">Зарегистрироваться</span>
+            </a>
+          {% endif %}
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="container">
+    <h1 class="page-title" data-i18n="register_title">Зарегистрируйтесь на PocketOption</h1>
+    <p class="page-subtitle" data-i18n="register_subtitle">чтобы мы могли связать ваш аккаунт с системой</p>
+
+    <div class="form-box">
+      <h2 class="form-title" data-i18n="check_title">Проверка трейдер ID</h2>
+
+      <form method="post" action="/check">
+        <input type="hidden" name="user_id" value="{{ user_id }}" />
+        <input type="text" name="trader_id" placeholder="Введите ваш Trader ID" required data-i18n-placeholder="placeholder_trader_id" />
+        <button type="submit" class="btn-submit" data-i18n="btn_continue">Продолжить</button>
+      </form>
+
+      <a href="https://u3.shortink.io/register?utm_campaign=824666&utm_source=affiliate&utm_medium=sr&a=16ZjQA8RfjI79Z&ac=qomex&code=EIX228" target="_blank" class="btn-secondary" data-i18n="btn_register_pocket">
+        Зарегистрироваться на PocketOption
+      </a>
+
+      <div class="helper-links">
+        <a href="javascript:void(0)" onclick="openPopup('popup-why')" data-i18n="why_register">Для чего нужно зарегистрироваться</a>
+        <a href="javascript:void(0)" onclick="openPopup('popup-where')" data-i18n="where_trader_id">Где найти Trader ID</a>
+      </div>
+
+      {% if result %}
+      <div class="result error">{{ result }}</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- POPUPS -->
+  <div class="popup-overlay" id="popup-why">
+    <div class="popup-box">
+      <span class="popup-close" onclick="closePopup('popup-why')">&times;</span>
+      <h2 data-i18n="popup_why_title">Почему нужно зарегистрироваться</h2>
+      <p data-i18n="popup_why_text">Регистрация на PocketOption позволяет системе связать сигналы с вашим трейдерским аккаунтом, отслеживать вашу активность и начислять бонусы за активную торговлю.</p>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="popup-where">
+    <div class="popup-box">
+      <span class="popup-close" onclick="closePopup('popup-where')">&times;</span>
+      <h2 data-i18n="popup_where_title">Где найти ваш Trader ID</h2>
+      <p data-i18n="popup_where_text">Зайдите в личный кабинет PocketOption, откройте раздел «Профиль». Там вы увидите ваш уникальный Trader ID — он состоит из цифр и букв.</p>
+    </div>
+  </div>
+
+  <!-- JS: бургер + закрытие меню и автоскрытие хедера на скролле -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const burger = document.getElementById('burger-button');
+      const overlay = document.getElementById('mobile-overlay');
+
+      if (burger && overlay) {
+        burger.addEventListener('click', () => {
+          const isOpen = overlay.classList.toggle('active');
+          burger.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        // Закрыть меню по клику на фон или на пункт
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) overlay.classList.remove('active');
+        });
+        overlay.querySelectorAll('.mobile-nav a, .mobile-btn').forEach(a => {
+          a.addEventListener('click', () => overlay.classList.remove('active'));
+        });
+      }
+
+      // Автоскрытие хедера при скролле вниз на мобилке
+      let last = 0;
+      const header = document.querySelector('.header');
+      window.addEventListener('scroll', () => {
+        if (window.innerWidth <= 768 && header) {
+          const y = window.scrollY || document.documentElement.scrollTop;
+          if (y > last) header.style.transform = 'translateY(-100%)';
+          else header.style.transform = 'translateY(0)';
+          last = y <= 0 ? 0 : y;
+        }
+      });
+    });
+  </script>
+
+  <script src="/static/js/check.js"></script>
+</body>
+</html>

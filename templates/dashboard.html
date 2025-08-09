@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trading Signal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="static/img/logosite.svg?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+/* ===============================
+   BASE / RESET
+   =============================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0f0f0f;
+  color: white;
+  line-height: 1.4;
+}
+
+/* Звёздный фон */
+canvas#stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Ссылки */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ===============================
+   HEADER (фиксированный)
+   =============================== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  padding: 0 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  background: transparent; /* фон прозрачный, под ним звезды */
+}
+
+.header-inner {
+  width: 100%;
+  max-width: 1300px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-container { /* у тебя это есть – оставляю, чтобы не ломать */
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+}
+
+/* Лого */
+.logo-link {
+  display: inline-block;
+}
+
+.logo {
+  width: 160px;
+  height: auto;
+}
+
+/* Навигация (ПК) */
+.nav {
+  display: flex;
+  gap: 30px;
+}
+
+.nav a {
+  color: #ccc;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav a:hover {
+  color: #fff;
+}
+
+/* Правая часть (профиль/регистрация + языки) */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Кнопка профиль/регистрация */
+.contact-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border: 1px solid #444;
+  border-radius: 50px;
+  color: #ccc;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  white-space: nowrap;
+}
+
+.contact-btn img {
+  width: 22px;
+  height: 22px;
+}
+
+.contact-btn:hover {
+  border-color: #777;
+  background: rgba(255,255,255,0.04);
+}
+
+/* Языки */
+.language-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: 20px;
+}
+
+.lang-icon {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  user-select: none;
+}
+
+.lang-icon.active {
+  opacity: 1;
+  transform: none;
+}
+
+.lang-icon:hover {
+  opacity: 0.8;
+}
+
+/* Бургер (скрыт на ПК, показывается на мобилке) */
+.burger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 26px;
+  height: 20px;
+  cursor: pointer;
+  z-index: 1001;
+  background: transparent;
+  border: 0;
+}
+
+.burger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background-color: white;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+/* Мобильное меню-оверлей */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+}
+
+.mobile-overlay.active {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Панель меню слева */
+.mobile-menu {
+  background-color: #1b1b1e;
+  width: 70%;
+  max-width: 320px;
+  padding: 80px 20px;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.5);
+  transform: translateX(-100%);
+  animation: slideIn 0.3s forwards;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+@keyframes slideIn {
+  to { transform: translateX(0); }
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.mobile-nav a {
+  font-size: 18px;
+  color: white;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.mobile-nav a:hover {
+  opacity: 0.85;
+  transform: translateX(4px);
+}
+
+/* Класс для скрытия элемента на мобилке (например, .contact-btn) */
+.desktop-only {
+  display: inline-flex;
+}
+
+/* ===============================
+   CONTENT WRAPPER
+   =============================== */
+.container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;            /* центрирование на ПК */
+  padding-top: 80px;            /* запас под фикс-хедер (ПК) */
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* Главная карточка */
+.signal-wrapper {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 24px;
+  padding: 40px;
+  display: flex;
+  gap: 60px;
+  max-width: 1300px;
+  width: 100%;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 30px rgba(0,0,0,0.3);
+}
+
+/* Левая и правая колонки (ПК) */
+.left-block {
+  flex: 1;
+}
+
+.right-block {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 280px;
+}
+
+/* Текстовые блоки */
+.title {
+  font-size: 20px;
+  margin-bottom: 14px;
+  color: #ffffff;
+}
+
+.note {
+  font-size: 15px;
+  color: #d6b900;
+  margin-bottom: 20px;
+}
+
+/* TradingView */
+.tradingview-widget-container {
+  width: 100%;
+}
+
+#tradingview_chart {
+  width: 100%;
+  height: 500px; /* ПК-высота */
+}
+
+/* Карточки-инфобоксы справа */
+.info-box {
+  background: #1f1f1f;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+}
+
+.info-box span.value {
+  display: block;
+  margin-top: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Валютные флаги и пара */
+.pair-flag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.flag {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #fff;
+}
+
+/* Кнопка */
+.reset-btn {
+  background: linear-gradient(135deg, #d44aff, #6f4aff);
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 50px;
+  padding: 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.3s ease, transform 0.05s ease;
+}
+
+.reset-btn:hover {
+  opacity: 0.9;
+}
+
+.reset-btn:active {
+  transform: translateY(1px);
+}
+
+/* Подпись снизу */
+.info-text {
+  margin-top: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  text-align: left;
+  max-width: 100%;
+  opacity: 0.3;
+}
+
+/* Лого внизу карточки (ПК) */
+.logo-wrapper {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.logo-wrapper img {
+  height: 20px;
+  opacity: 0.6;
+}
+
+/* ===============================
+   MOBILE ADAPTATION
+   =============================== */
+@media (max-width: 768px) {
+
+  /* Хедер */
+  .header {
+    height: 60px;
+    padding: 0 16px;
+  }
+
+  .header-inner,
+  .header-container {
+    padding: 0;
+    justify-content: space-between;
+  }
+
+  .logo {
+    width: 170px;
+  }
+
+  .nav {
+    display: none; /* прячем навигацию в хедере на мобилке */
+  }
+
+  .contact-btn,
+  .desktop-only {
+    display: none !important; /* прячем Профиль/Регистрация на мобиле */
+  }
+
+  .language-icons {
+    margin-left: 0;
+    gap: 8px;
+  }
+
+  .burger {
+    display: flex; /* показать бургер */
+  }
+
+  /* Контент */
+  .container {
+    align-items: flex-start;     /* перестаем вертикально центрировать */
+    min-height: auto;
+    padding-top: 90px;           /* отступ под фиксированный хедер */
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 40px;
+  }
+
+  .signal-wrapper {
+    flex-direction: column;
+    padding: 24px 20px;
+    gap: 20px;
+    border-radius: 20px;
+    max-width: 480px;
+    margin: 0 auto;
+    backdrop-filter: blur(10px);
+  }
+
+  .left-block,
+  .right-block {
+    width: 100%;
+  }
+
+  .title {
+    font-size: 16px;
+    text-align: left;
+    margin-bottom: 10px;
+  }
+
+  .note {
+    font-size: 13px;
+    text-align: left;
+    margin-bottom: 12px;
+    color: #ffc700; /* по мокапу ярче */
+  }
+
+  #tradingview_chart {
+    height: 320px !important; /* компактная высота для мобилок */
+  }
+
+  .right-block {
+    gap: 16px;
+  }
+
+  .info-box {
+    padding: 14px;
+  }
+
+  .info-box span.value {
+    font-size: 18px;
+  }
+
+  .flag {
+    width: 20px;
+    height: 20px;
+  }
+
+  .reset-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+
+  }
+
+  .info-text {
+    text-align: center;
+    font-size: 12px;
+    opacity: 1;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .logo-wrapper {
+    display: none; /* логотип внизу карточки скрываем на мобилке */
+  }
+}
+
+@media (max-width: 768px) {
+  #tradingview_chart {
+    height: 240px !important; /* уменьшаем высоту графика */
+  }
+
+  .tradingview-widget-container {
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 12px; /* закруглим, чтобы выглядело аккуратно */
+  }
+}
+
+.header {
+  transition: transform 0.3s ease;
+}
+
+    </style>
+    </head>
+<body>
+<canvas id="stars"></canvas>
+
+<header class="header">
+  <div class="header-container header-inner">
+
+    <!-- Бургер (мобилка) -->
+    <button id="burger-button" class="burger" aria-label="Открыть меню" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Логотип по центру -->
+    <a href="/" class="logo-link" aria-label="QOMEX Home">
+      <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+    </a>
+
+    <!-- Десктопная навигация -->
+    <nav class="nav" role="navigation" aria-label="Главная навигация">
+      <a href="/#about" data-i18n="header_about">О софте</a>
+      <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+      <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+      <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+
+    </nav>
+
+    <!-- Правый блок: профиль (только ПК) + языки -->
+    <div class="header-right">
+      {% if request.cookies.get("user_email") %}
+      <a href="/profile" class="contact-btn desktop-only">
+        <span data-i18n="header_profile">Профиль</span>
+
+      </a>
+      {% else %}
+      <a href="/auth" class="contact-btn desktop-only">
+        <span data-i18n="header_register">Зарегистрироваться</span>
+      </a>
+      {% endif %}
+
+      <div class="language-icons">
+        <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+        <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+        <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
+      </div>
+    </div>
+  </div>
+
+  <!-- Мобильное меню (без кнопки Профиль/Регистрация) -->
+  <!-- Мобильное меню -->
+<div class="mobile-overlay" id="mobile-overlay">
+  <div class="mobile-menu">
+    <nav class="mobile-nav" aria-label="Мобильное меню">
+      <a href="/#about" data-i18n="header_about">О софте</a>
+      <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+      <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+      <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+
+      <!-- Кнопка профиля/регистрации для мобилки -->
+      {% if request.cookies.get("user_email") %}
+        <a href="/profile" class="mobile-btn">
+          <span data-i18n="header_profile">Профиль</span>
+        </a>
+      {% else %}
+        <a href="/auth" class="mobile-btn">
+          <span data-i18n="header_register">Зарегистрироваться</span>
+        </a>
+      {% endif %}
+    </nav>
+  </div>
+</div>
+
+</header>
+
+
+<div class="container">
+    <div class="signal-wrapper">
+        <div class="left-block">
+            <div class="title" data-i18n="dashboard_title">Получай сигналы для торговли на PocketOption от QOMEXtrading</div>
+            <div class="note" data-i18n="dashboard_note">*Торговля валютными парами типа Market не доступна для торгов!</div>
+            <div class="tradingview-widget-container">
+                <div id="tradingview_chart" style="height: 500px;"></div>
+            </div>
+        </div>
+
+        <div class="right-block">
+            <div class="info-box">
+                <span data-i18n="currency_pair"></span>
+                <div class="pair-flag">
+                    <img id="flag1" src="" class="flag">
+                    <img id="flag2" src="" class="flag">
+                    <span class="value" id="pair">BTC/USDT</span>
+                </div>
+            </div>
+            <div class="info-box">
+                <span data-i18n="potential"></span>
+                <span class="value" id="direction"><span id="dir-icon"></span> <span id="dir-text">UP</span></span>
+            </div>
+            <div class="info-box">
+                <span data-i18n="timeframe"></span>
+                <span class="value" id="timeframe">5 min</span>
+            </div>
+            <button class="reset-btn" data-i18n="get_signal" onclick="resetSignal()">get signal</button>
+
+            <p class="info-text" data-i18n="info_text">
+                *Используй сигналы, чтобы увеличить доходность на PocketOption. Алгоритмы QOMEX подберут лучшие моменты входа. Все данные защищены.
+            </p>
+
+            <div class="logo-wrapper">
+                <img src="/static/img/QomexLogo%202.svg" alt="QOMEX Logo">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const burger = document.getElementById('burger-button');
+  const overlay = document.getElementById('mobile-overlay');
+
+  if (burger && overlay) {
+    burger.addEventListener('click', () => {
+      const isOpen = overlay.classList.toggle('active');
+      burger.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove('active');
+        burger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  let lastScrollTop = 0;
+  const header = document.querySelector(".header");
+
+  window.addEventListener("scroll", function () {
+    let scrollTop = window.scrollY || document.documentElement.scrollTop;
+
+    if (window.innerWidth <= 768) { // Только для мобилок
+      if (scrollTop > lastScrollTop) {
+        // Скролл вниз — прячем хедер
+        header.style.transform = "translateY(-100%)";
+      } else {
+        // Скролл вверх — показываем хедер
+        header.style.transform = "translateY(0)";
+      }
+    }
+
+    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // защита от отрицательных значений
+  });
+});
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.getElementById("stars");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let stars = [];
+
+        for (let i = 0; i < 250; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 1.5,
+                d: Math.random() * 0.5,
+            });
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            for (let i = 0; i < stars.length; i++) {
+                const s = stars[i];
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
+            updateStars();
+            requestAnimationFrame(drawStars);
+        }
+
+        function updateStars() {
+            for (let i = 0; i < stars.length; i++) {
+                const s = stars[i];
+                s.y += s.d;
+                if (s.y > canvas.height) {
+                    s.y = 0;
+                    s.x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        drawStars();
+    });
+</script>
+
+
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<script>
+    const pairs = [
+        'EUR/USD', 'GBP/USD', 'USD/JPY', 'USD/CHF', 'USD/CAD',
+        'AUD/USD', 'NZD/USD', 'EUR/GBP', 'EUR/JPY', 'GBP/JPY',
+        'AUD/JPY', 'EUR/AUD', 'GBP/CAD', 'CHF/JPY', 'NZD/JPY',
+        'BTC/USDT', 'ETH/USDT', 'XRP/USDT', 'LTC/USDT', 'ADA/USDT',
+        'DOGE/USDT', 'BNB/USDT', 'SOL/USDT', 'TRX/USDT'
+    ];
+
+    const tvSymbols = {
+        'EUR/USD': 'FX:EURUSD', 'GBP/USD': 'FX:GBPUSD', 'USD/JPY': 'FX:USDJPY',
+        'USD/CHF': 'FX:USDCHF', 'USD/CAD': 'FX:USDCAD', 'AUD/USD': 'FX:AUDUSD',
+        'NZD/USD': 'FX:NZDUSD', 'EUR/GBP': 'FX:EURGBP', 'EUR/JPY': 'FX:EURJPY',
+        'GBP/JPY': 'FX:GBPJPY', 'AUD/JPY': 'FX:AUDJPY', 'EUR/AUD': 'FX:EURAUD',
+        'GBP/CAD': 'FX:GBPCAD', 'CHF/JPY': 'FX:CHFJPY', 'NZD/JPY': 'FX:NZDJPY',
+        'BTC/USDT': 'BINANCE:BTCUSDT', 'ETH/USDT': 'BINANCE:ETHUSDT', 'XRP/USDT': 'BINANCE:XRPUSDT',
+        'LTC/USDT': 'BINANCE:LTCUSDT', 'ADA/USDT': 'BINANCE:ADAUSDT', 'DOGE/USDT': 'BINANCE:DOGEUSDT',
+        'BNB/USDT': 'BINANCE:BNBUSDT', 'SOL/USDT': 'BINANCE:SOLUSDT', 'TRX/USDT': 'BINANCE:TRXUSDT'
+    };
+
+    const flagMap = {
+        'USD': 'us', 'EUR': 'eu', 'GBP': 'gb', 'JPY': 'jp', 'CHF': 'ch',
+        'CAD': 'ca', 'AUD': 'au', 'NZD': 'nz',
+        'BTC': 'btc', 'ETH': 'eth', 'XRP': 'xrp', 'LTC': 'ltc', 'ADA': 'ada',
+        'DOGE': 'doge', 'BNB': 'bnb', 'SOL': 'sol', 'TRX': 'trx', 'USDT': 'usdt'
+    };
+
+    let currentPair = 'BTC/USDT';
+
+    function renderChart(symbol) {
+        document.getElementById('tradingview_chart').innerHTML = '';
+        new TradingView.widget({
+            container_id: "tradingview_chart",
+            width: '100%',
+            height: 500,
+            symbol: symbol,
+            interval: "1",
+            timezone: "Etc/UTC",
+            theme: "dark",
+            style: "1",
+            locale: "en",
+            enable_publishing: false,
+            hide_side_toolbar: false,
+            allow_symbol_change: false,
+            studies: ["Volume@tv-basicstudies"]
+        });
+    }
+
+    function updateFlags(pair) {
+        const [base, quote] = pair.split('/');
+        const getFlagURL = (code) => {
+            const cc = flagMap[code];
+            if (!cc) return '';
+            const crypto = ['btc', 'eth', 'xrp', 'ltc', 'ada', 'doge', 'bnb', 'sol', 'trx', 'usdt'];
+            return crypto.includes(cc)
+                ? `https://assets.coincap.io/assets/icons/${cc}@2x.png`
+                : `https://purecatamphetamine.github.io/country-flag-icons/3x2/${cc.toUpperCase()}.svg`;
+        };
+        document.getElementById('flag1').src = getFlagURL(base);
+        document.getElementById('flag2').src = getFlagURL(quote);
+    }
+
+    function resetSignal() {
+        const randomIndex = Math.floor(Math.random() * pairs.length);
+        currentPair = pairs[randomIndex];
+        document.getElementById('pair').textContent = currentPair;
+        updateFlags(currentPair);
+
+        const newDirection = Math.random() > 0.5 ? 'UP' : 'DOWN';
+        const icon = newDirection === 'UP'
+            ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-miterlimit="5.759" d="M3 3v16a2 2 0 0 0 2 2h16"/><path stroke-miterlimit="5.759" d="m7 14l4-4l4 4l6-6"/><path d="M18 8h3v3"/></g></svg>`
+            : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-miterlimit="5.759" d="M3 3v16a2 2 0 0 0 2 2h16"/><path stroke-miterlimit="5.759" d="m7 9l4 4l4-4l6 6"/><path d="M18 15h3v-3"/></g></svg>`;
+
+        document.getElementById('dir-icon').innerHTML = icon;
+        const dirText = document.getElementById('dir-text');
+        dirText.textContent = newDirection;
+        dirText.style.color = newDirection === 'UP' ? '#4cff81' : '#ff4c4c';
+
+
+        const timeOptions = [1, 3, 5];
+        const randomTime = timeOptions[Math.floor(Math.random() * timeOptions.length)];
+        document.getElementById('timeframe').textContent = `${randomTime} min`;
+
+        renderChart(tvSymbols[currentPair]);
+    }
+
+    renderChart(tvSymbols[currentPair]);
+    updateFlags(currentPair);
+    document.getElementById('dir-icon').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-miterlimit="5.759" d="M3 3v16a2 2 0 0 0 2 2h16"/><path stroke-miterlimit="5.759" d="m7 14l4-4l4 4l6-6"/><path d="M18 8h3v3"/></g></svg>`;
+</script>
+
+    <script>
+  const translations = {
+    "ru": {
+      "header_about": "О софте",
+      "header_risks": "Виды риска",
+      "header_signals": "Сигналы",
+      "header_instruction": "Инструкция",
+      "header_profile": "Профиль",
+      "header_register": "Зарегистрироваться",
+      "dashboard_title": "Получай сигналы для торговли на PocketOption от QOMEXtrading",
+      "dashboard_note": "*Торговля валютными парами типа Market не доступна для торгов!",
+      "currency_pair": "Валютная пара",
+      "potential": "Потенциал",
+      "timeframe": "Таймфрейм",
+      "get_signal": "Получить сигнал",
+      "info_text": "*Используй сигналы, чтобы увеличить доходность на PocketOption. Алгоритмы QOMEX подберут лучшие моменты входа. Все данные защищены."
+    },
+    "en": {
+      "header_about": "About",
+      "header_risks": "Risk Types",
+      "header_signals": "Signals",
+      "header_instruction": "Instruction",
+      "header_profile": "Profile",
+      "header_register": "Register",
+      "dashboard_title": "Get trading signals for PocketOption from QOMEXtrading",
+      "dashboard_note": "*Trading market-type currency pairs is not available!",
+      "currency_pair": "Currency pair",
+      "potential": "Potential",
+      "timeframe": "Timeframe",
+      "get_signal": "Get Signal",
+      "info_text": "*Use signals to increase profitability on PocketOption. QOMEX algorithms will find the best entry points. All data is secured."
+    },
+    "ua": {
+      "header_about": "Про софт",
+      "header_risks": "Види ризику",
+      "header_signals": "Сигнали",
+      "header_instruction": "Інструкція",
+      "header_profile": "Профіль",
+      "header_register": "Зареєструватися",
+      "dashboard_title": "Отримуй сигнали для торгівлі на PocketOption від QOMEXtrading",
+      "dashboard_note": "*Торгівля валютними парами типу Market недоступна!",
+      "currency_pair": "Валютна пара",
+      "potential": "Потенціал",
+      "timeframe": "Таймфрейм",
+      "get_signal": "Отримати сигнал",
+      "info_text": "*Використовуйте сигнали для підвищення прибутковості на PocketOption. Алгоритми QOMEX підберуть найкращі моменти входу. Дані захищено."
+    }
+  };
+
+  function applyTranslations(lang) {
+    const t = translations[lang];
+    if (!t) return;
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+  }
+
+  function setLanguage(lang) {
+    localStorage.setItem('language', lang);
+    applyTranslations(lang);
+    document.querySelectorAll('.lang-icon').forEach(icon => {
+      icon.classList.toggle('active', icon.dataset.lang === lang);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const lang = localStorage.getItem('language') || 'ru';
+    applyTranslations(lang);
+    setLanguage(lang);
+
+    document.querySelectorAll('.lang-icon').forEach(icon => {
+      icon.addEventListener('click', () => setLanguage(icon.dataset.lang));
+    });
+
+    // Проставим переводы для нестатичных блоков вручную:
+    document.querySelector(".title").setAttribute("data-i18n", "dashboard_title");
+    document.querySelector(".note").setAttribute("data-i18n", "dashboard_note");
+    document.querySelector(".reset-btn").setAttribute("data-i18n", "get_signal");
+    document.querySelector(".info-text").setAttribute("data-i18n", "info_text");
+
+
+  });
+</script>
+
+
+
+</body>
+</html>

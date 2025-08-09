@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Проверка депозита</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" href="static/img/logosite.svg?v=1">
+  <link rel="stylesheet" href="/static/deposit-check.css">
+  {% if status == 'success' %}
+  <meta http-equiv="refresh" content="3;url=/dashboard">
+  {% endif %}
+</head>
+<body>
+  <!-- Звёздный фон -->
+  <canvas id="stars"></canvas>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-container header-inner">
+
+      <!-- Бургер (мобилка) -->
+      <button id="burger-button" class="burger" aria-label="Открыть меню" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- Логотип по центру -->
+      <a href="/" class="logo-link" aria-label="QOMEX Home">
+        <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+      </a>
+
+      <!-- Навигация (ПК) -->
+      <nav class="nav" role="navigation" aria-label="Главная навигация">
+        <a href="/#about" data-i18n="header_about">О софте</a>
+        <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+        <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+        <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+      </nav>
+
+      <!-- Правая часть: Профиль/Регистрация (ПК) + языки -->
+      <div class="header-right">
+        {% if request.cookies.get("user_email") %}
+        <a href="/profile" class="contact-btn desktop-only">
+          <span data-i18n="header_profile">Профиль</span>
+
+        </a>
+        {% else %}
+        <a href="/auth" class="contact-btn desktop-only">
+          <span data-i18n="header_register">Зарегистрироваться</span>
+
+        </a>
+        {% endif %}
+
+        <div class="language-icons">
+          <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+          <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+          <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
+        </div>
+      </div>
+    </div>
+
+    <!-- Мобильное меню (с кнопкой Профиль/Регистрация) -->
+    <div class="mobile-overlay" id="mobile-overlay">
+      <div class="mobile-menu">
+        <nav class="mobile-nav" aria-label="Мобильное меню">
+          <a href="/#about" data-i18n="header_about">О софте</a>
+          <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+          <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+          <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+
+          {% if request.cookies.get("user_email") %}
+            <a href="/profile">
+              <span data-i18n="header_profile">Профиль</span>
+            </a>
+          {% else %}
+            <a href="/auth">
+              <span data-i18n="header_register">Зарегистрироваться</span>
+            </a>
+          {% endif %}
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="container">
+    <div class="headings">
+      <h1 data-i18n="deposit_title">Внесите депозит на сайте <span>PocketOption</span></h1>
+      <p data-i18n="deposit_subtitle">Мы проверяем, внесли ли вы депозит на PocketOption через нашу систему</p>
+    </div>
+
+    <div class="form-wrapper">
+      {% if status == 'success' %}
+        <h2 data-i18n="deposit_success_title">✅ Депозит подтверждён</h2>
+        <p data-i18n="deposit_success_text">Вы внесли <strong>{{ amount }}$</strong>. Сейчас вы будете перенаправлены...</p>
+      {% else %}
+        <h2 data-i18n="deposit_fail_title">Депозит не найден <span class="red">❌</span></h2>
+        <p data-i18n="deposit_fail_text">
+          Пожалуйста, пополните счёт минимум<br>
+          на <span class="highlight">50$</span> для того чтобы получить доступ<br>
+          <strong>К СИГНАЛАМ</strong>
+        </p>
+        <h3 data-i18n="your_balance">Ваш баланс: {{ amount }}$</h3>
+        <a class="btn" href="https://pocketoption.com" target="_blank" data-i18n="btn_deposit">пополнить баланс</a>
+        <button class="btn" onclick="location.reload()" data-i18n="btn_check">проверить депозит</button>
+      {% endif %}
+    </div>
+  </main>
+
+  <!-- Stars animation -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const canvas = document.getElementById("stars");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const stars = [];
+      for (let i = 0; i < 250; i++) {
+        stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5, d: Math.random()*0.5 });
+      }
+
+      function drawStars() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "white";
+        for (let i = 0; i < stars.length; i++) {
+          const s = stars[i];
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2, false);
+          ctx.fill();
+        }
+        for (let i = 0; i < stars.length; i++) {
+          const s = stars[i];
+          s.y += s.d;
+          if (s.y > canvas.height) { s.y = 0; s.x = Math.random()*canvas.width; }
+        }
+        requestAnimationFrame(drawStars);
+      }
+      drawStars();
+    });
+  </script>
+
+  <!-- i18n -->
+  <script>
+    const translations = {
+      ru: {
+        header_about: "О софте", header_risks: "Виды риска", header_signals: "Сигналы", header_instruction: "Инструкция",
+        header_profile: "Профиль", header_register: "Зарегистрироваться",
+        deposit_title: "Внесите депозит на сайте <span>PocketOption</span>",
+        deposit_subtitle: "Мы проверяем, внесли ли вы депозит на PocketOption через нашу систему",
+        deposit_success_title: "✅ Депозит подтверждён",
+        deposit_success_text: "Вы внесли <strong>{{ amount }}$</strong>. Сейчас вы будете перенаправлены...",
+        deposit_fail_title: "Депозит не найден <span class='red'>❌</span>",
+        deposit_fail_text: "Пожалуйста, пополните счёт минимум<br><span class='highlight'>50$</span> для того чтобы получить доступ<br><strong>К СИГНАЛАМ</strong>",
+        your_balance: "Ваш баланс: {{ amount }}$",
+        btn_deposit: "пополнить баланс",
+        btn_check: "проверить депозит"
+      },
+      en: {
+        header_about: "About", header_risks: "Risk Types", header_signals: "Signals", header_instruction: "Instruction",
+        header_profile: "Profile", header_register: "Register",
+        deposit_title: "Make a deposit on <span>PocketOption</span>",
+        deposit_subtitle: "We are checking if you made a deposit via our system",
+        deposit_success_title: "✅ Deposit confirmed",
+        deposit_success_text: "You have deposited <strong>{{ amount }}$</strong>. Redirecting...",
+        deposit_fail_title: "Deposit not found <span class='red'>❌</span>",
+        deposit_fail_text: "Please deposit at least<br><span class='highlight'>50$</span> to gain access<br><strong>TO SIGNALS</strong>",
+        your_balance: "Your balance: {{ amount }}$",
+        btn_deposit: "deposit now",
+        btn_check: "check deposit"
+      },
+      ua: {
+        header_about: "Про софт", header_risks: "Види ризику", header_signals: "Сигнали", header_instruction: "Інструкція",
+        header_profile: "Профіль", header_register: "Зареєструватися",
+        deposit_title: "Зробіть депозит на сайті <span>PocketOption</span>",
+        deposit_subtitle: "Ми перевіряємо, чи внесли ви депозит через нашу систему",
+        deposit_success_title: "✅ Депозит підтверджено",
+        deposit_success_text: "Ви внесли <strong>{{ amount }}$</strong>. Зараз ви будете перенаправлені...",
+        deposit_fail_title: "Депозит не знайдено <span class='red'>❌</span>",
+        deposit_fail_text: "Будь ласка, поповніть рахунок мінімум<br><span class='highlight'>50$</span>, щоб отримати доступ<br><strong>ДО СИГНАЛІВ</strong>",
+        your_balance: "Ваш баланс: {{ amount }}$",
+        btn_deposit: "поповнити рахунок",
+        btn_check: "перевірити депозит"
+      }
+    };
+
+    function applyTranslations(lang) {
+      const t = translations[lang]; if (!t) return;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.innerHTML = t[key];
+      });
+    }
+    function setLanguage(lang) {
+      localStorage.setItem('language', lang);
+      applyTranslations(lang);
+      document.querySelectorAll('.lang-icon').forEach(icon => {
+        icon.classList.toggle('active', icon.dataset.lang === lang);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const lang = localStorage.getItem('language') || 'ru';
+      applyTranslations(lang);
+      setLanguage(lang);
+
+      document.querySelectorAll('.lang-icon').forEach(icon => {
+        icon.addEventListener('click', () => setLanguage(icon.dataset.lang));
+      });
+
+      // Бургер
+      const burger = document.getElementById('burger-button');
+      const overlay = document.getElementById('mobile-overlay');
+      if (burger && overlay) {
+        burger.addEventListener('click', () => {
+          const isOpen = overlay.classList.toggle('active');
+          burger.setAttribute('aria-expanded', String(isOpen));
+        });
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('active'); });
+        overlay.querySelectorAll('.mobile-nav a').forEach(a => a.addEventListener('click', () => overlay.classList.remove('active')));
+      }
+
+      // Автоскрытие хедера при скролле на мобилке
+      let last = 0;
+      const header = document.querySelector('.header');
+      window.addEventListener('scroll', () => {
+        if (window.innerWidth <= 768 && header) {
+          const y = window.scrollY || document.documentElement.scrollTop;
+          header.style.transform = (y > last) ? 'translateY(-100%)' : 'translateY(0)';
+          last = y <= 0 ? 0 : y;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

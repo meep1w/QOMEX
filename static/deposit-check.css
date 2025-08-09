@@ -1,0 +1,202 @@
+/* ===============================
+   BASE
+   =============================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+  background: #0f0f0f;
+  color: #fff;
+  line-height: 1.4;
+  overflow: hidden; /* включим на мобилке */
+}
+
+/* Звёздный фон */
+#stars, canvas#stars {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Ссылки */
+a { color: inherit; text-decoration: none; }
+
+/* ===============================
+   HEADER (как на странице сигналов)
+   =============================== */
+.header {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 80px;
+  padding: 0 30px;
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000;
+  background: transparent;
+  transition: transform 0.3s ease; /* для автоскрытия */
+}
+
+.header-inner,
+.header-container {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 30px;
+}
+
+.logo-link { display: inline-block; }
+.logo { width: 160px; height: auto; }
+
+.nav { display: flex; gap: 30px; }
+.nav a { color: #ccc; font-weight: 500; transition: color 0.2s; }
+.nav a:hover { color: #fff; }
+
+.header-right { display: flex; align-items: center; gap: 20px; }
+
+.contact-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 16px; border-radius: 50px;
+  border: 1px solid #444; color: #ccc;
+  transition: border-color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+.contact-btn img { width: 22px; height: 22px; }
+.contact-btn:hover { border-color: #777; background: rgba(255,255,255,0.04); }
+
+.language-icons { display: flex; align-items: center; gap: 16px; margin-left: 20px; }
+.lang-icon { width: 18px; height: 18px; cursor: pointer; opacity: 0.4; transition: opacity 0.2s; }
+.lang-icon.active, .lang-icon:hover { opacity: 1; }
+
+/* Бургер */
+.burger {
+  display: none; flex-direction: column; justify-content: space-between;
+  width: 26px; height: 20px; cursor: pointer; background: transparent; border: 0; z-index: 1001;
+}
+.burger span { display: block; height: 3px; width: 100%; background: #fff; border-radius: 2px; transition: 0.3s; }
+
+/* Мобильное меню */
+.mobile-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 1000;
+}
+.mobile-overlay.active { display: flex; justify-content: flex-start; }
+
+.mobile-menu {
+  background: #1b1b1e;
+  width: 70%; max-width: 320px;
+  padding: 80px 20px;
+  box-shadow: 4px 0 12px rgba(0,0,0,0.5);
+  transform: translateX(-100%); animation: slideIn 0.3s forwards;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  border-top-right-radius: 12px; border-bottom-right-radius: 12px;
+}
+@keyframes slideIn { to { transform: translateX(0); } }
+
+.mobile-nav { display: flex; flex-direction: column; gap: 22px; }
+.mobile-nav a { font-size: 18px; color: #fff; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+.mobile-nav a:hover { opacity: 0.85; transform: translateX(4px); }
+
+/* Профиль/Регистрация – как обычный пункт меню */
+.mobile-nav a img { width: 18px; height: 18px; }
+
+/* ===============================
+   CONTENT LAYOUT
+   =============================== */
+.container {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 120px 20px 40px; /* запас под хедер */
+  text-align: center;
+  gap: 18px;
+}
+
+/* Заголовки */
+.headings h1 {
+  font-size: 28px; font-weight: 700; margin-bottom: 6px;
+}
+.headings h1 span { color: #fff; }
+.headings p { font-size: 16px; color: #bbb; }
+
+/* Белая форма */
+.form-wrapper {
+  background: #fff; color: #000;
+  padding: 30px; border-radius: 16px;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 0 30px rgba(190,119,255,0.15);
+  text-align: center;
+}
+
+.form-wrapper h2 { font-size: 20px; margin-bottom: 16px; }
+.form-wrapper p  { font-size: 14px; line-height: 1.55; margin: 10px 0; }
+.form-wrapper h3 { font-size: 18px; font-weight: 600; margin: 18px 0; }
+
+/* Кнопки */
+.btn {
+  display: block; width: 100%;
+  padding: 12px 0; margin: 10px 0;
+  border: none; border-radius: 30px;
+  background: linear-gradient(90deg, #d44aff, #6f4aff);
+  color: #fff; font-weight: 700; font-size: 15px;
+  transition: 0.2s ease;
+  text-transform: none;
+  text-align: center;
+}
+.btn:hover { opacity: 0.9; }
+
+/* Акценты */
+.red { color: #ff3d94; font-size: 22px; vertical-align: middle; }
+.highlight { color: #c42aff; font-weight: 700; }
+
+/* ===============================
+   MOBILE
+   =============================== */
+@media (max-width: 768px) {
+  html, body { overflow: auto; }
+
+  .header { height: 60px; padding: 0 16px; }
+  .logo { width: 170px; }
+  .nav, .contact-btn { display: none !important; } /* прячем навигацию и кнопку в хедере */
+  .burger { display: flex; }
+  .language-icons { gap: 8px; margin-left: 0; }
+
+  .container {
+    /* центрируем контент по вертикали, учитывая фикс-хедер */
+    padding: 96px 16px 40px;
+    min-height: calc(100vh - 96px);
+    min-height: calc(100svh - 96px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .headings h1 { font-size: 20px; margin-bottom: 6px; }
+  .headings p  { font-size: 14px; }
+
+  .form-wrapper {
+    max-width: 440px;
+    padding: 22px 18px; border-radius: 16px;
+    box-shadow: 0 0 30px rgba(190,119,255,0.18);
+  }
+
+  .form-wrapper h2 { font-size: 18px; margin-bottom: 12px; }
+  .form-wrapper p  { font-size: 14px; }
+  .form-wrapper h3 { font-size: 16px; margin: 14px 0; }
+
+  .btn { font-size: 16px; padding: 14px 0; border-radius: 50px; }
+}
+
+/* ===============================
+   VERY SMALL (<=360px)
+   =============================== */
+@media (max-width: 360px) {
+  .logo { width: 150px; }
+  .headings h1 { font-size: 18px; }
+  .headings p  { font-size: 13px; }
+  .form-wrapper { padding: 18px 14px; }
+}
