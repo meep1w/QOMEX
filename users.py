@@ -1,19 +1,25 @@
 # users.py
-from fastapi import APIRouter
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse, RedirectResponse
+from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import User
 
 router = APIRouter()
 
-@router.get("/users")
-async def get_all_users():
+# Зависимость для работы с БД
+def get_db():
     db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@router.get("/users")
+async def get_all_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
-    db.close()
-    users_data = []
-    for u in users:
-        users_data.append({
+    users_data = [
+        {
             "id": u.id,
             "login": u.login,
             "email": u.email,
@@ -23,16 +29,10 @@ async def get_all_users():
             "created_at": u.created_at.isoformat() if u.created_at else None,
             "updated_at": u.updated_at.isoformat() if u.updated_at else None,
             "click_id": u.click_id
-        })
+        }
+        for u in users
+    ]
     return JSONResponse({"users": users_data})
-
-
-from fastapi.responses import JSONResponse
-
-
-class RedirectResponse:
-    pass
-
 
 @router.post("/logout")
 async def logout():
