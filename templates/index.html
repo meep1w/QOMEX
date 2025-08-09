@@ -13,67 +13,56 @@
     <!-- Фоновая сетка -->
     <div class="background-image"></div>
 
-<!-- HEADER -->
-  <header class="header">
-    <div class="header-container header-inner">
+<header class="header">
+  <div class="container header-inner">
 
-      <!-- Бургер (мобилка) -->
-      <button id="burger-button" class="burger" aria-label="Открыть меню" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+<div class="burger-icon" id="burger">
+ <img src="/static/img/HamburgerMd.svg" alt="Menu" class="burger-icon" />
+</div>
 
-      <!-- Логотип -->
-      <a href="/" class="logo-link" aria-label="QOMEX Home">
-        <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+<div class="mobile-menu" id="mobileMenu">
+  <div class="close-btn" id="closeMenu">×</div>
+  <a href="#about">О софте</a>
+  <a href="#advantages">Виды риска</a>
+  <a href="/go-to-signals">Сигналы</a>
+  <a href="#instruction">Инструкция</a>
+  <a href="/profile">Профиль</a>
+</div>
+
+
+    <a href="/" class="logo-link">
+      <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+    </a>
+
+    <nav class="nav">
+      <a href="#about" data-i18n="header_about">О софте</a>
+      <a href="#advantages" data-i18n="header_risks">Виды риска</a>
+      <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+      <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
+    </nav>
+
+    <div class="header-right">
+      {% if request.cookies.get("user_email") %}
+      <a href="/profile" class="contact-btn">
+        <span data-i18n="header_profile">Профиль</span>
+
       </a>
+      {% else %}
+      <a href="/auth" class="contact-btn">
+        <span data-i18n="header_register">Зарегистрироваться</span>
 
-      <!-- Навигация (ПК) -->
-      <nav class="nav" role="navigation" aria-label="Главная навигация">
-        <a href="/#about" data-i18n="header_about">О софте</a>
-        <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
-        <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-        <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
-      </nav>
-
-      <!-- Правый блок: профиль (ПК) + языки -->
-      <div class="header-right">
-        {% if request.cookies.get("user_email") %}
-        <a href="/profile" class="contact-btn desktop-only">
-          <span data-i18n="header_profile">Профиль</span>
-
-        </a>
-        {% else %}
-        <a href="/auth" class="contact-btn desktop-only">
-          <span data-i18n="header_register">Зарегистрироваться</span>
-
-        </a>
-        {% endif %}
-
-        <div class="language-icons">
-          <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
-          <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
-          <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
-        </div>
-      </div>
+      </a>
+      {% endif %}
     </div>
 
-    <!-- Мобильное меню -->
-    <div class="mobile-overlay" id="mobile-overlay" aria-hidden="true">
-      <div class="mobile-menu">
-        <nav class="mobile-nav" aria-label="Мобильное меню">
-          <a href="/#about" data-i18n="header_about">О софте</a>
-          <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
-          <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-          <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
-          {% if request.cookies.get("user_email") %}
-            <a href="/profile" data-i18n="header_profile">Профиль</a>
-          {% else %}
-            <a href="/auth" data-i18n="header_register">Зарегистрироваться</a>
-          {% endif %}
-        </nav>
-      </div>
+    <div class="language-icons">
+      <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+      <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+      <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
     </div>
-  </header>
+
+  </div>
+</header>
 
 
 
