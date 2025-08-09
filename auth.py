@@ -8,7 +8,7 @@ import secrets
 import os
 
 from database import SessionLocal
-from models import User
+from models import User, PostbackLog
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -28,13 +28,45 @@ def _ensure_click_id_in_cookie(request: Request) -> str:
     """Берём click_id из cookie, если нет — генерим новый"""
     cid = request.cookies.get("click_id")
     if not cid:
-        # короткий безопасный id (URL-safe)
-        cid = secrets.token_urlsafe(8)
+        cid = secrets.token_urlsafe(8)  # короткий безопасный id (URL-safe)
     return cid
+
+
+# --- Новый блок: подтягивание старых постбэков ---
+def attach_pending_postbacks(db, user: User):
+    q = db.query(PostbackLog).filter(PostbackLog.processed == False)
+    if user.click_id:
+        q = q.filter(PostbackLog.click_id == user.click_id)
+    elif user.trader_id:
+        q = q.filter(PostbackLog.trader_id == user.trader_id)
+    else:
+        return
+
+    logs = q.all()
+    if not logs:
+        return
+
+    for pb in logs:
+        if pb.event == "deposit" and (pb.amount or 0) > 0:
+            if user.first_deposit is None:
+                user.first_deposit = pb.amount
+            user.total_deposit = (user.total_deposit or 0.0) + (pb.amount or 0.0)
+
+        if pb.trader_id and not user.trader_id:
+            user.trader_id = pb.trader_id
+
+        pb.user_id = user.id
+        pb.processed = True
+        pb.processed_at = datetime.utcnow()
+
+    user.updated_at = datetime.utcnow()
+    db.commit()
+
 
 @router.get("/auth")
 async def auth_form(request: Request):
     return templates.TemplateResponse("auth.html", {"request": request})
+
 
 @router.post("/auth")
 async def handle_auth(
@@ -50,7 +82,6 @@ async def handle_auth(
         remember_bool = (remember == "true")
         max_age = 60 * 60 * 24 * 30 if remember_bool else None
 
-        # click_id из cookie (или свежесгенерённый)
         click_id_cookie = _ensure_click_id_in_cookie(request)
 
         if action == "register":
@@ -65,7 +96,7 @@ async def handle_auth(
                 login=login,
                 email=email,
                 password=hashed_pw,
-                click_id=click_id_cookie,  # сохраняем click_id
+                click_id=click_id_cookie,
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow(),
             )
@@ -73,14 +104,15 @@ async def handle_auth(
             db.commit()
             db.refresh(new_user)
 
+            # --- Подтягиваем постбэки ---
+            attach_pending_postbacks(db, new_user)
+
             resp = JSONResponse({"success": True, "click_id": click_id_cookie})
-            # user_id / email
             resp.set_cookie("user_id", str(new_user.id), httponly=True, max_age=max_age,
                             secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
             if new_user.email:
                 resp.set_cookie("user_email", new_user.email, max_age=max_age,
                                 secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
-            # click_id в куку (если его не было — теперь будет)
             resp.set_cookie("click_id", click_id_cookie, max_age=60*60*24*30,
                             secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
             return resp
@@ -90,16 +122,16 @@ async def handle_auth(
             if not user or not verify_password(password, user.password):
                 return JSONResponse({"success": False, "message": "Неверный логин или пароль."})
 
-            # Синхронизация click_id:
-            # 1) если у пользователя в БД пусто, но в куке есть — запишем в БД
             if not user.click_id and click_id_cookie:
                 user.click_id = click_id_cookie
                 user.updated_at = datetime.utcnow()
                 db.commit()
                 db.refresh(user)
-            # 2) если в куке пусто, а в БД есть — выставим куку
             if not click_id_cookie and user.click_id:
                 click_id_cookie = user.click_id
+
+            # --- Подтягиваем постбэки ---
+            attach_pending_postbacks(db, user)
 
             resp = JSONResponse({"success": True, "click_id": user.click_id or click_id_cookie})
             resp.set_cookie("user_id", str(user.id), httponly=True, max_age=max_age,
@@ -107,7 +139,6 @@ async def handle_auth(
             if user.email:
                 resp.set_cookie("user_email", user.email, max_age=max_age,
                                 secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
-            # всегда поддерживаем cookie click_id
             if click_id_cookie:
                 resp.set_cookie("click_id", click_id_cookie, max_age=60*60*24*30,
                                 secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
@@ -118,6 +149,7 @@ async def handle_auth(
 
     finally:
         db.close()
+
 
 @router.post("/password-reset")
 async def password_reset(
