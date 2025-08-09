@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="icon" type="image/png" href="static/img/logosite.svg?v=1">
+   <link rel="stylesheet" href="/static/header.css">
     <link rel="stylesheet" href="static/index.css" />
     <title>QOMEX Trading</title>
 </head>
@@ -13,55 +14,53 @@
     <!-- Фоновая сетка -->
     <div class="background-image"></div>
 
+<!-- Header -->
 <header class="header">
-  <div class="container header-inner">
+    <div class="container header-inner">
 
-<div class="burger-icon" id="burger">
- <img src="/static/img/HamburgerMd.svg" alt="Menu" class="burger-icon" />
+  <!-- Бургер-кнопка -->
+<div id="burger-button" class="burger">
+  <span></span>
+  <span></span>
+  <span></span>
 </div>
 
-<div class="mobile-menu" id="mobileMenu">
-  <div class="close-btn" id="closeMenu">×</div>
-  <a href="#about">О софте</a>
-  <a href="#advantages">Виды риска</a>
-  <a href="/go-to-signals">Сигналы</a>
-  <a href="#instruction">Инструкция</a>
-  <a href="/profile">Профиль</a>
-</div>
-
-
-    <a href="/" class="logo-link">
-      <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
-    </a>
-
-    <nav class="nav">
-      <a href="#about" data-i18n="header_about">О софте</a>
-      <a href="#advantages" data-i18n="header_risks">Виды риска</a>
-      <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-      <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
+<div class="mobile-overlay">
+  <div class="mobile-menu">
+    <nav class="mobile-nav">
+     <a href="#about" data-i18n="header_about">О софте</a>
+            <a href="#advantages" data-i18n="header_risks">Виды риска</a>
+            <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+            <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
     </nav>
-
-    <div class="header-right">
-      {% if request.cookies.get("user_email") %}
-      <a href="/profile" class="contact-btn">
-        <span data-i18n="header_profile">Профиль</span>
-
-      </a>
-      {% else %}
-      <a href="/auth" class="contact-btn">
-        <span data-i18n="header_register">Зарегистрироваться</span>
-
-      </a>
-      {% endif %}
-    </div>
-
-    <div class="language-icons">
-      <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
-      <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
-      <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
-    </div>
-
   </div>
+</div>
+
+
+
+
+        <a href="/" class="logo-link">
+            <img src="/static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+        </a>
+        <nav class="nav">
+            <a href="#about" data-i18n="header_about">О софте</a>
+            <a href="#advantages" data-i18n="header_risks">Виды риска</a>
+            <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+            <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
+        </nav>
+        <div class="header-actions">
+            {% if request.cookies.get("user_email") %}
+            <a href="/profile" class="contact-btn profile-btn" data-i18n="header_profile">Профиль<img src="/static/img/UserAddOutlined.svg" alt="Profile" /></a>
+            {% else %}
+            <a href="/auth" class="contact-btn profile-btn" data-i18n="header_register">Зарегистрироваться<img src="/static/img/UserAddOutlined.svg" alt="Telegram" /></a>
+            {% endif %}
+            <div class="language-icons">
+                <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+                <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+                <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
+            </div>
+        </div>
+    </div>
 </header>
 
 
