@@ -4,16 +4,22 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from typing import Optional
+import os
 
 from database import SessionLocal
 from models import User
-from utils import gen_click_id
+from utils import gen_click_id, attach_pending_postbacks
 
 router = APIRouter(prefix="/check")
 templates = Jinja2Templates(directory="templates")
 
-PO_BASE = "https://u3.shortink.io/register?utm_campaign=824666&utm_source=affiliate&utm_medium=sr&a=16ZjQA8RfjI79Z&ac=qomex&code=EIX228"
-OUT_PARAM_NAME = "click_id"  # если у PP другое имя для {click_id} в ссылке — поменяй тут
+# Партнёрская ссылка (без click_id — его добавим сами)
+PO_BASE = "https://u3.shortink.io/smart/16ZjQA8RfjI79Z"
+OUT_PARAM_NAME = "click_id"  # в PP это именно click_id
+
+
+IS_SECURE_COOKIES = os.getenv("ENV", "dev") != "dev"
+SAMESITE_POLICY = "Lax"
 
 def get_db():
     db = SessionLocal()
@@ -41,11 +47,19 @@ async def check_form(request: Request, db: Session = Depends(get_db), user_id: O
 
     click_id, ref_link = _ref_link_from_request(request)
 
+    # если юзер известен — сохраним click_id и подтянем висящие постбэки
     if user_id:
-        me = db.get(User, user_id)  # SQLAlchemy 2.x
-        if me and not me.click_id:
-            me.click_id = click_id
-            db.commit()
+        me = db.get(User, user_id)
+        if me:
+            changed = False
+            if not me.click_id:
+                me.click_id = click_id
+                changed = True
+            if changed:
+                db.commit()
+                db.refresh(me)
+            # важное: подтянуть логи, если уже что-то прилетало по этому click_id
+            attach_pending_postbacks(db, me)
 
     resp = templates.TemplateResponse("register_check.html", {
         "request": request,
@@ -53,7 +67,8 @@ async def check_form(request: Request, db: Session = Depends(get_db), user_id: O
         "result": None,
         "ref_link": ref_link,
     })
-    resp.set_cookie(key="click_id", value=click_id, max_age=60*60*24*30)
+    resp.set_cookie("click_id", click_id, max_age=60*60*24*30,
+                    secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
     return resp
 
 @router.post("")
@@ -68,7 +83,6 @@ async def check_trader_id(
 
     click_id, ref_link = _ref_link_from_request(request)
 
-    # 1) Должен быть авторизован
     if user_id is None:
         return templates.TemplateResponse("register_check.html", {
             "request": request,
@@ -86,9 +100,16 @@ async def check_trader_id(
             "ref_link": ref_link,
         })
 
-    # 2) Проверяем, что постбэк УЖЕ записал trader_id юзеру
+    # синхронизируем click_id, если ещё не сохранён у пользователя
+    if not me.click_id and click_id:
+        me.click_id = click_id
+        db.commit()
+        db.refresh(me)
+
+    # перед проверкой — подтянем возможные постбэки (могли прийти за это время)
+    attach_pending_postbacks(db, me)
+
     if not me.trader_id:
-        # постбэк еще не пришёл или не сматчился по click_id
         return templates.TemplateResponse("register_check.html", {
             "request": request,
             "user_id": user_id,
@@ -97,7 +118,6 @@ async def check_trader_id(
                       "Убедитесь, что регистрировались по нашей ссылке и попробуйте чуть позже.",
         })
 
-    # 3) Строгое сравнение: введённый trader_id должен совпасть с тем, что пришёл постбэком
     if trader_id.strip() != (me.trader_id or "").strip():
         return templates.TemplateResponse("register_check.html", {
             "request": request,
@@ -106,7 +126,7 @@ async def check_trader_id(
             "result": "❌ Введённый Trader ID не совпадает с данными от брокера.",
         })
 
-    # 4) Совпало — пускаем дальше на проверку депозита
     resp = RedirectResponse(url=f"/deposit-check?trader_id={trader_id}", status_code=302)
-    resp.set_cookie(key="trader_id", value=trader_id, max_age=60*60*24*30)
+    resp.set_cookie("trader_id", trader_id, max_age=60*60*24*30,
+                    secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
     return resp
