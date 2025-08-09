@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from typing import Optional
+from urllib.parse import urlencode, urlsplit, urlunsplit, parse_qsl
 import os
 
 from database import SessionLocal
@@ -13,10 +14,9 @@ from utils import gen_click_id, attach_pending_postbacks
 router = APIRouter(prefix="/check")
 templates = Jinja2Templates(directory="templates")
 
-# Партнёрская ссылка (без click_id — его добавим сами)
+# Смарт-рефка Pocket Partners (без click_id — добавим сами)
 PO_BASE = "https://u3.shortink.io/smart/16ZjQA8RfjI79Z"
-OUT_PARAM_NAME = "click_id"  # в PP это именно click_id
-
+OUT_PARAM_NAME = "click_id"  # у PP именно click_id
 
 IS_SECURE_COOKIES = os.getenv("ENV", "dev") != "dev"
 SAMESITE_POLICY = "Lax"
@@ -35,9 +35,16 @@ def _get_user_id_from_cookie(request: Request) -> Optional[int]:
     except:
         return None
 
+def _add_params(url: str, params: dict) -> str:
+    """Безопасно добавляем параметры к URL (исключаем двойные ?/&)."""
+    u = urlsplit(url)
+    q = dict(parse_qsl(u.query))
+    q.update(params)
+    return urlunsplit((u.scheme, u.netloc, u.path, urlencode(q), u.fragment))
+
 def _ref_link_from_request(request: Request) -> tuple[str, str]:
     click_id = request.cookies.get("click_id") or gen_click_id()
-    ref_link = f"{PO_BASE}&{OUT_PARAM_NAME}={click_id}"
+    ref_link = _add_params(PO_BASE, {OUT_PARAM_NAME: click_id})
     return click_id, ref_link
 
 @router.get("")
@@ -47,18 +54,17 @@ async def check_form(request: Request, db: Session = Depends(get_db), user_id: O
 
     click_id, ref_link = _ref_link_from_request(request)
 
-    # если юзер известен — сохраним click_id и подтянем висящие постбэки
+    # если пользователь известен — сохраним click_id и подтянем постбэки
     if user_id:
         me = db.get(User, user_id)
         if me:
-            changed = False
+            updated = False
             if not me.click_id:
                 me.click_id = click_id
-                changed = True
-            if changed:
+                updated = True
+            if updated:
                 db.commit()
                 db.refresh(me)
-            # важное: подтянуть логи, если уже что-то прилетало по этому click_id
             attach_pending_postbacks(db, me)
 
     resp = templates.TemplateResponse("register_check.html", {
@@ -100,13 +106,12 @@ async def check_trader_id(
             "ref_link": ref_link,
         })
 
-    # синхронизируем click_id, если ещё не сохранён у пользователя
+    # синхронизируем click_id и подтягиваем возможные постбэки
     if not me.click_id and click_id:
         me.click_id = click_id
         db.commit()
         db.refresh(me)
 
-    # перед проверкой — подтянем возможные постбэки (могли прийти за это время)
     attach_pending_postbacks(db, me)
 
     if not me.trader_id:
@@ -115,7 +120,7 @@ async def check_trader_id(
             "user_id": user_id,
             "ref_link": ref_link,
             "result": "⌛ Мы ещё не получили ваш Trader ID от брокера. "
-                      "Убедитесь, что регистрировались по нашей ссылке и попробуйте чуть позже.",
+                      "Убедитесь, что регистрировались по нашей ссылке и попробуйте позже.",
         })
 
     if trader_id.strip() != (me.trader_id or "").strip():
