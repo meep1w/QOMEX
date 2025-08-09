@@ -8,15 +8,14 @@ from urllib.parse import urlencode, urlsplit, urlunsplit, parse_qsl
 import os
 
 from database import SessionLocal
-from models import User
+from models import User, PostbackLog
 from utils import gen_click_id, attach_pending_postbacks
 
 router = APIRouter(prefix="/check")
 templates = Jinja2Templates(directory="templates")
 
-# Смарт-рефка Pocket Partners (без click_id — добавим сами)
 PO_BASE = "https://u3.shortink.io/smart/16ZjQA8RfjI79Z"
-OUT_PARAM_NAME = "click_id"  # у PP именно click_id
+OUT_PARAM_NAME = "click_id"
 
 IS_SECURE_COOKIES = os.getenv("ENV", "dev") != "dev"
 SAMESITE_POLICY = "Lax"
@@ -36,7 +35,6 @@ def _get_user_id_from_cookie(request: Request) -> Optional[int]:
         return None
 
 def _add_params(url: str, params: dict) -> str:
-    """Безопасно добавляем параметры к URL (исключаем двойные ?/&)."""
     u = urlsplit(url)
     q = dict(parse_qsl(u.query))
     q.update(params)
@@ -54,17 +52,16 @@ async def check_form(request: Request, db: Session = Depends(get_db), user_id: O
 
     click_id, ref_link = _ref_link_from_request(request)
 
-    # если пользователь известен — сохраним click_id и подтянем постбэки
     if user_id:
         me = db.get(User, user_id)
         if me:
-            updated = False
+            changed = False
             if not me.click_id:
                 me.click_id = click_id
-                updated = True
-            if updated:
-                db.commit()
-                db.refresh(me)
+                changed = True
+            if changed:
+                db.commit(); db.refresh(me)
+            # подтянуть «висящие» события по click_id/trader_id
             attach_pending_postbacks(db, me)
 
     resp = templates.TemplateResponse("register_check.html", {
@@ -84,6 +81,7 @@ async def check_trader_id(
     user_id: Optional[int] = Form(None),
     db: Session = Depends(get_db)
 ):
+    trader_id = (trader_id or "").strip()
     if user_id is None:
         user_id = _get_user_id_from_cookie(request)
 
@@ -106,14 +104,27 @@ async def check_trader_id(
             "ref_link": ref_link,
         })
 
-    # синхронизируем click_id и подтягиваем возможные постбэки
+    # синхронизируем click_id (если надо)
     if not me.click_id and click_id:
         me.click_id = click_id
-        db.commit()
-        db.refresh(me)
+        db.commit(); db.refresh(me)
 
+    # 1) перед проверкой подтянем все «висящие» логи
     attach_pending_postbacks(db, me)
 
+    # 2) если всё ещё нет trader_id — попробуем найти его ЛОКАЛЬНО в логах по введённому trader_id
+    if not me.trader_id and trader_id:
+        pb = (db.query(PostbackLog)
+                .filter(PostbackLog.trader_id == trader_id)
+                .order_by(PostbackLog.id.desc())
+                .first())
+        if pb:
+            # прикрепим трейдер к пользователю и применим все его события
+            me.trader_id = trader_id
+            db.commit(); db.refresh(me)
+            attach_pending_postbacks(db, me)
+
+    # 3) после всех попыток — если trader_id так и нет, показываем ожидание
     if not me.trader_id:
         return templates.TemplateResponse("register_check.html", {
             "request": request,
@@ -123,7 +134,8 @@ async def check_trader_id(
                       "Убедитесь, что регистрировались по нашей ссылке и попробуйте позже.",
         })
 
-    if trader_id.strip() != (me.trader_id or "").strip():
+    # 4) строгая сверка введённого id с тем, что в БД (на случай опечаток)
+    if trader_id and trader_id != (me.trader_id or ""):
         return templates.TemplateResponse("register_check.html", {
             "request": request,
             "user_id": user_id,
@@ -131,7 +143,8 @@ async def check_trader_id(
             "result": "❌ Введённый Trader ID не совпадает с данными от брокера.",
         })
 
-    resp = RedirectResponse(url=f"/deposit-check?trader_id={trader_id}", status_code=302)
-    resp.set_cookie("trader_id", trader_id, max_age=60*60*24*30,
+    # 5) всё ок — идём на проверку депозита
+    resp = RedirectResponse(url=f"/deposit-check?trader_id={me.trader_id}", status_code=302)
+    resp.set_cookie("trader_id", me.trader_id, max_age=60*60*24*30,
                     secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
     return resp
