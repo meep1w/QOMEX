@@ -1,3 +1,4 @@
+# auth.py
 from fastapi import APIRouter, Request, Form, Body
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -7,8 +8,10 @@ from typing import Optional
 import secrets
 import os
 
+from sqlalchemy import exists
+
 from database import SessionLocal
-from models import User, PostbackLog
+from models import User, PostbackLog  # PostbackLog нужен для attach_pending_postbacks ниже
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -31,8 +34,15 @@ def _ensure_click_id_in_cookie(request: Request) -> str:
         cid = secrets.token_urlsafe(8)  # короткий безопасный id (URL-safe)
     return cid
 
+def ensure_unique_click_id(db, cid: Optional[str]) -> str:
+    """Возвращает свободный click_id (если занято — сгенерирует новый)."""
+    if not cid:
+        cid = secrets.token_urlsafe(8)
+    while db.query(exists().where(User.click_id == cid)).scalar():
+        cid = secrets.token_urlsafe(8)
+    return cid
 
-# --- Новый блок: подтягивание старых постбэков ---
+# --- подтягивание старых постбэков ---
 def attach_pending_postbacks(db, user: User):
     q = db.query(PostbackLog).filter(PostbackLog.processed == False)
     if user.click_id:
@@ -82,7 +92,7 @@ async def handle_auth(
         remember_bool = (remember == "true")
         max_age = 60 * 60 * 24 * 30 if remember_bool else None
 
-        click_id_cookie = _ensure_click_id_in_cookie(request)
+        raw_click_id = _ensure_click_id_in_cookie(request)
 
         if action == "register":
             if db.query(User).filter(User.login == login).first():
@@ -90,6 +100,8 @@ async def handle_auth(
             if email and db.query(User).filter(User.email == email).first():
                 return JSONResponse({"success": False, "message": "Этот email уже занят."})
 
+            # берём СВОБОДНЫЙ click_id (чтобы не упасть по UNIQUE)
+            click_id_cookie = ensure_unique_click_id(db, raw_click_id)
             hashed_pw = hash_password(password)
 
             new_user = User(
@@ -104,7 +116,7 @@ async def handle_auth(
             db.commit()
             db.refresh(new_user)
 
-            # --- Подтягиваем постбэки ---
+            # подтянем постбэки, если были
             attach_pending_postbacks(db, new_user)
 
             resp = JSONResponse({"success": True, "click_id": click_id_cookie})
@@ -113,6 +125,7 @@ async def handle_auth(
             if new_user.email:
                 resp.set_cookie("user_email", new_user.email, max_age=max_age,
                                 secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
+            # обновим куку на тот click_id, который точно свободен
             resp.set_cookie("click_id", click_id_cookie, max_age=60*60*24*30,
                             secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
             return resp
@@ -122,15 +135,19 @@ async def handle_auth(
             if not user or not verify_password(password, user.password):
                 return JSONResponse({"success": False, "message": "Неверный логин или пароль."})
 
-            if not user.click_id and click_id_cookie:
-                user.click_id = click_id_cookie
+            click_id_cookie = raw_click_id
+
+            # если у пользователя в БД пусто — выдадим ему свободный click_id
+            if not user.click_id:
+                safe_cid = ensure_unique_click_id(db, click_id_cookie)
+                if safe_cid != click_id_cookie:
+                    click_id_cookie = safe_cid  # заменим куку ниже
+                user.click_id = safe_cid
                 user.updated_at = datetime.utcnow()
                 db.commit()
                 db.refresh(user)
-            if not click_id_cookie and user.click_id:
-                click_id_cookie = user.click_id
 
-            # --- Подтягиваем постбэки ---
+            # подтянем постбэки
             attach_pending_postbacks(db, user)
 
             resp = JSONResponse({"success": True, "click_id": user.click_id or click_id_cookie})
@@ -139,9 +156,9 @@ async def handle_auth(
             if user.email:
                 resp.set_cookie("user_email", user.email, max_age=max_age,
                                 secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
-            if click_id_cookie:
-                resp.set_cookie("click_id", click_id_cookie, max_age=60*60*24*30,
-                                secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
+            # поддержим корректный click_id в куке
+            resp.set_cookie("click_id", user.click_id or click_id_cookie, max_age=60*60*24*30,
+                            secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
             return resp
 
         else:
