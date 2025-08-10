@@ -114,13 +114,31 @@
     </div>
 
     <div class="tab-content" id="reset">
-        <p data-i18n="reset_text">
-            Чтобы изменить пароль, отправьте запрос на ваш email.<br>
-            Вы получите ссылку для сброса пароля.
-        </p>
-        <input type="email" placeholder="user@example.com" />
-        <button class="save-btn" data-i18n="send_link">Отправить ссылку</button>
-    </div>
+  <p data-i18n="reset_text">
+    Чтобы изменить пароль, отправьте запрос на ваш email.<br>
+    Вы получите ссылку для сброса пароля.
+  </p>
+
+  <form id="profile-password-reset-form" class="form-grid" style="max-width:460px;">
+    <label for="profile-reset-email" data-i18n="your_email">Ваша почта</label>
+    <input
+      type="email"
+      id="profile-reset-email"
+      name="email"
+      value="{{ user.email }}"
+      placeholder="user@example.com"
+      required
+      style="width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#111;color:#fff"
+    />
+
+    <button type="submit" class="save-btn" style="margin-top:12px;" data-i18n="send_link">
+      Отправить ссылку
+    </button>
+
+    <div id="profile-reset-msg" style="display:none;margin-top:8px;color:#bbb;"></div>
+  </form>
+</div>
+
 
     <div class="tab-content" id="referral">
         <p data-i18n="referral_soon">Скоро</p>
@@ -128,6 +146,54 @@
 </main>
 
 <script src="/static/js/profile.js?v=3"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('profile-password-reset-form');
+  if (!form) return;
+
+  const emailEl = document.getElementById('profile-reset-email');
+  const msg = document.getElementById('profile-reset-msg');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (emailEl?.value || '').trim();
+    if (!email) return;
+
+    if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+
+    try {
+      const res = await fetch('/password-reset-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json().catch(() => ({}));
+      const ok = data.success === true || data.ok === true;
+
+      if (ok && data.reset_url) {
+        // мгновенный переход на форму смены пароля
+        window.location.href = data.reset_url;
+        return;
+      }
+
+      // если reset_url нет (например, email не найден) — покажем сообщение
+      if (msg) {
+        msg.style.display = 'block';
+        msg.textContent = ok
+          ? 'Если email существует, ссылка для сброса отправлена.'
+          : (data.message || data.detail || 'Ошибка. Попробуйте позже.');
+      }
+    } catch {
+      if (msg) {
+        msg.style.display = 'block';
+        msg.textContent = 'Сеть недоступна. Попробуйте позже.';
+      }
+    }
+  });
+});
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
