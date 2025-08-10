@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from database import Base, engine
-
+from admin import init_admin
 # грузим .env один раз на старте (чтобы SMTP/BASE_URL и т.д. были в окружении)
 from dotenv import load_dotenv
 load_dotenv(dotenv_path="/var/www/qomex/.env")
@@ -44,3 +44,5 @@ templates = Jinja2Templates(directory="templates")
 
 # Таблицы БД
 Base.metadata.create_all(bind=engine)
+
+init_admin(app)
