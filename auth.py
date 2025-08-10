@@ -9,7 +9,6 @@ import secrets
 import os
 
 from sqlalchemy import exists
-
 from database import SessionLocal
 from models import User, PostbackLog  # для attach_pending_postbacks
 
@@ -97,10 +96,14 @@ async def handle_auth(
         raw_click_id = _ensure_click_id_in_cookie(request)
 
         if action == "register":
+            # базовая валидация
+            if not email:
+                return JSONResponse({"success": False, "message": "Укажите email."}, status_code=400)
+
             if db.query(User).filter(User.login == login).first():
-                return JSONResponse({"success": False, "message": "Этот логин уже занят."})
-            if email and db.query(User).filter(User.email == email).first():
-                return JSONResponse({"success": False, "message": "Этот email уже занят."})
+                return JSONResponse({"success": False, "message": "Этот логин уже занят."}, status_code=409)
+            if db.query(User).filter(User.email == email).first():
+                return JSONResponse({"success": False, "message": "Этот email уже занят."}, status_code=409)
 
             click_id_cookie = ensure_unique_click_id(db, raw_click_id)
             hashed_pw = hash_password(password)
@@ -121,18 +124,18 @@ async def handle_auth(
 
             resp = JSONResponse({"success": True, "click_id": click_id_cookie})
             resp.set_cookie("user_id", str(new_user.id), httponly=True, max_age=max_age,
-                            secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
+                            secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY, path="/")
             if new_user.email:
                 resp.set_cookie("user_email", new_user.email, max_age=max_age,
-                                secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
+                                secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY, path="/")
             resp.set_cookie("click_id", click_id_cookie, max_age=60*60*24*30,
-                            secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
+                            secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY, path="/")
             return resp
 
         elif action == "login":
             user = db.query(User).filter(User.login == login).first()
             if not user or not verify_password(password, user.password):
-                return JSONResponse({"success": False, "message": "Неверный логин или пароль."})
+                return JSONResponse({"success": False, "message": "Неверный логин или пароль."}, status_code=401)
 
             click_id_cookie = raw_click_id
 
@@ -149,16 +152,16 @@ async def handle_auth(
 
             resp = JSONResponse({"success": True, "click_id": user.click_id or click_id_cookie})
             resp.set_cookie("user_id", str(user.id), httponly=True, max_age=max_age,
-                            secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
+                            secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY, path="/")
             if user.email:
                 resp.set_cookie("user_email", user.email, max_age=max_age,
-                                secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
+                                secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY, path="/")
             resp.set_cookie("click_id", user.click_id or click_id_cookie, max_age=60*60*24*30,
-                            secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
+                            secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY, path="/")
             return resp
 
         else:
-            return JSONResponse({"success": False, "message": "Неверное действие."})
+            return JSONResponse({"success": False, "message": "Неверное действие."}, status_code=400)
 
     finally:
         db.close()

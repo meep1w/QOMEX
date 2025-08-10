@@ -264,14 +264,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const formData = new FormData(form);
       const remember = document.getElementById("remember")?.checked;
       if (typeof remember === "boolean") {
-        // гарантируем формат "true"/"false"
         formData.set("remember", remember ? "true" : "false");
       }
 
       try {
         const res = await fetch("/auth", { method: "POST", body: formData });
         const data = await res.json().catch(() => ({}));
-        const ok = res.ok || data.success === true || data.ok === true;
+
+        // успех только если success===true
+        const ok = data.success === true || data.ok === true;
 
         if (ok) {
           window.location.href = "/";
@@ -325,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const data = await res.json().catch(() => ({}));
-        const ok = res.ok || data.ok === true || data.success === true;
+        const ok = data.ok === true || data.success === true;
 
         if (resetMessage) {
           resetMessage.style.color = ok ? "green" : "red";
