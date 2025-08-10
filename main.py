@@ -5,7 +5,8 @@ from database import Base, engine
 
 # грузим .env один раз на старте (чтобы SMTP/BASE_URL и т.д. были в окружении)
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(dotenv_path="/var/www/qomex/.env")
+
 
 # --- ваши роутеры ---
 from auth import router as auth_router
