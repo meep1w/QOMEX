@@ -1,166 +1,177 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title data-i18n="auth_register">Регистрация / Вход</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" type="image/png" href="static/img/logosite.svg?v=1">
-  <link rel="stylesheet" href="/static/auth.css" />
+    <meta charset="UTF-8" />
+    <title data-i18n="auth_register">Регистрация / Вход</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="static/img/logosite.svg?v=1">
+    <link rel="stylesheet" href="/static/auth.css" />
 </head>
 <body>
-  <canvas id="stars"></canvas>
+<canvas id="stars"></canvas>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-container header-inner">
+<!-- HEADER -->
+<header class="header">
+    <div class="container header-inner">
 
-      <!-- Бургер (мобилка) -->
-      <button id="burger-button" class="burger" aria-label="Открыть меню" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+        <button id="burger" class="burger-btn" aria-label="Открыть меню" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
 
-      <!-- Логотип -->
-      <a href="/" class="logo-link" aria-label="QOMEX Home">
-        <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
-      </a>
+        <div class="mobile-menu" id="mobileMenu">
+            <button class="close-btn" id="closeMenu" aria-label="Закрыть">×</button>
 
-      <!-- Навигация (ПК) -->
-      <nav class="nav" role="navigation" aria-label="Главная навигация">
-        <a href="/#about" data-i18n="header_about">О софте</a>
-        <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
-        <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-        <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
-      </nav>
+            {% if request.cookies.get('user_email') %}
+            <a href="/profile" class="menu-cta" data-i18n="header_profile">Профиль</a>
+            {% else %}
+            <a href="/auth" class="menu-cta" data-i18n="header_register">Зарегистрироваться</a>
+            {% endif %}
 
-      <!-- Правый блок: профиль (ПК) + языки -->
-      <div class="header-right">
-        {% if request.cookies.get("user_email") %}
-        <a href="/profile" class="contact-btn desktop-only">
-          <span data-i18n="header_profile">Профиль</span>
+            <nav class="mobile-nav">
+                <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+                <a href="/#about" data-i18n="header_about">О софте</a>
+                <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+                <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+            </nav>
+        </div>
 
+        <a href="/" class="logo-link">
+            <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
         </a>
-        {% else %}
-        <a href="/auth" class="contact-btn desktop-only">
-          <span data-i18n="header_register">Зарегистрироваться</span>
 
-        </a>
-        {% endif %}
+        <nav class="nav">
+            <a href="/#about" data-i18n="header_about">О софте</a>
+            <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+            <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+            <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+        </nav>
+
+        <div class="header-right">
+            {% if request.cookies.get("user_email") %}
+            <a href="/profile" class="contact-btn">
+                <span data-i18n="header_profile">Профиль</span>
+            </a>
+            {% else %}
+            <a href="/auth" class="contact-btn">
+                <span data-i18n="header_register">Зарегистрироваться</span>
+            </a>
+            {% endif %}
+        </div>
 
         <div class="language-icons">
-          <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
-          <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
-          <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
+            <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+            <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+            <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
         </div>
-      </div>
     </div>
+</header>
 
-    <!-- Мобильное меню -->
-    <div class="mobile-overlay" id="mobile-overlay" aria-hidden="true">
-      <div class="mobile-menu">
-        <nav class="mobile-nav" aria-label="Мобильное меню">
-          <a href="/#about" data-i18n="header_about">О софте</a>
-          <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
-          <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-          <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
-          {% if request.cookies.get("user_email") %}
-            <a href="/profile" data-i18n="header_profile">Профиль</a>
-          {% else %}
-            <a href="/auth" data-i18n="header_register">Зарегистрироваться</a>
-          {% endif %}
-        </nav>
-      </div>
-    </div>
-  </header>
 
-  <!-- HEADER TEXT -->
-  <div class="header-text">
+<!-- HEADER TEXT -->
+<div class="header-text">
     <h1 id="header-title" data-i18n="auth_register_title">Зарегистрируйте аккаунт на QOMEX</h1>
     <p id="header-subtitle" data-i18n="auth_register_subtitle">Чтобы начать пользоваться лучшим инструментом для трейдинга</p>
-  </div>
+</div>
 
-  <!-- FORM -->
-  <div class="container">
+<!-- FORM -->
+<div class="container">
     <div class="form-wrapper">
-      <h2 id="form-title" data-i18n="auth_register">Регистрация</h2>
+        <h2 id="form-title" data-i18n="auth_register">Регистрация</h2>
 
-      <div id="error-message" class="error-message" style="display:none;"></div>
+        <div id="error-message" class="error-message" style="display:none;"></div>
 
-      <form id="auth-form">
-        <input type="hidden" name="action" id="action-input" value="register" />
-        <input type="hidden" name="click_id_from_request_or_form" value="{{ click_id }}">
+        <form id="auth-form">
+            <input type="hidden" name="action" id="action-input" value="register" />
+            <input type="hidden" name="click_id_from_request_or_form" value="{{ click_id }}">
 
-        <label for="login" data-i18n="auth_login">Логин</label>
-        <input type="text" id="login" name="login" placeholder="Введите логин" required data-i18n-placeholder="auth_login_placeholder" />
+            <label for="login" data-i18n="auth_login">Логин</label>
+            <input type="text" id="login" name="login" placeholder="Введите логин" required data-i18n-placeholder="auth_login_placeholder" />
 
-        <label for="email" data-i18n="auth_email">Email</label>
-        <input type="email" id="email" name="email" placeholder="Введите email" required data-i18n-placeholder="auth_email_placeholder" />
+            <label for="email" data-i18n="auth_email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Введите email" required data-i18n-placeholder="auth_email_placeholder" />
 
-        <label for="password" data-i18n="auth_password">Пароль</label>
-        <input type="password" id="password" name="password" placeholder="Введите пароль" required data-i18n-placeholder="auth_password_placeholder" />
-        <div class="indicator" id="password-strength" data-i18n="auth_password_strength">Сложность пароля: ...</div>
+            <label for="password" data-i18n="auth_password">Пароль</label>
+            <input type="password" id="password" name="password" placeholder="Введите пароль" required data-i18n-placeholder="auth_password_placeholder" />
+            <div class="indicator" id="password-strength" data-i18n="auth_password_strength">Сложность пароля: ...</div>
 
-        <div class="options">
-          <div class="remember-label">
-            <input type="checkbox" id="remember" name="remember" />
-            <label for="remember" data-i18n="auth_remember">Запомнить меня</label>
-          </div>
-          <a href="#" id="forgot-password-link" data-i18n="auth_forgot_password">Забыли пароль?</a>
+            <div class="options">
+                <div class="remember-label">
+                    <input type="checkbox" id="remember" name="remember" />
+                    <label for="remember" data-i18n="auth_remember">Запомнить меня</label>
+                </div>
+                <a href="#" id="forgot-password-link" data-i18n="auth_forgot_password">Забыли пароль?</a>
+            </div>
+
+            <button type="submit" id="submit-btn" data-i18n="auth_create_account">Создать аккаунт</button>
+        </form>
+
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#" id="switch-link" data-i18n="auth_switch_login">Есть аккаунт? Войдите</a>
         </div>
-
-        <button type="submit" id="submit-btn" data-i18n="auth_create_account">Создать аккаунт</button>
-      </form>
-
-      <div class="footer-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#" id="switch-link" data-i18n="auth_switch_login">Есть аккаунт? Войдите</a>
-      </div>
     </div>
-  </div>
+</div>
 
-  <!-- PASSWORD RESET POPUP -->
-  <div id="passwordResetPopup" class="popup-overlay" style="display:none;">
+<!-- PASSWORD RESET POPUP -->
+<div id="passwordResetPopup" class="popup-overlay" style="display:none;">
     <div class="popup-content">
-      <button id="closeResetPopup" class="close-btn" aria-label="Закрыть">&times;</button>
-      <h3 data-i18n="auth_reset_title">Сбросить пароль</h3>
-      <p data-i18n="auth_reset_instruction">Введите ваш email для получения ссылки на сброс пароля.</p>
-      <form id="password-reset-form">
-        <input type="email" id="reset-email" name="email" placeholder="Email" required data-i18n-placeholder="auth_email_placeholder" />
-        <button type="submit" class="btn" data-i18n="auth_reset_send">Отправить ссылку</button>
-      </form>
-      <div id="reset-message" style="margin-top:10px;color:red;"></div>
+        <button id="closeResetPopup" class="close-btn" aria-label="Закрыть">&times;</button>
+        <h3 data-i18n="auth_reset_title">Сбросить пароль</h3>
+        <p data-i18n="auth_reset_instruction">Введите ваш email для получения ссылки на сброс пароля.</p>
+        <form id="password-reset-form">
+            <input type="email" id="reset-email" name="email" placeholder="Email" required data-i18n-placeholder="auth_email_placeholder" />
+            <button type="submit" class="btn" data-i18n="auth_reset_send">Отправить ссылку</button>
+        </form>
+        <div id="reset-message" style="margin-top:10px;color:red;"></div>
     </div>
-  </div>
+</div>
 
-  <!-- Scripts -->
-  <script src="/static/js/auth.js"></script>
-  <script>
+<!-- Scripts -->
+<script src="/static/js/auth.js"></script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
-      const burger = document.getElementById('burger-button');
-      const overlay = document.getElementById('mobile-overlay');
-      if (!burger || !overlay) return;
+        const burger = document.getElementById('burger');
+        const menu   = document.getElementById('mobileMenu');
+        const close  = document.getElementById('closeMenu');
 
-      burger.addEventListener('click', () => {
-        const open = overlay.classList.toggle('active');
-        burger.setAttribute('aria-expanded', String(open));
-        overlay.setAttribute('aria-hidden', String(!open));
-      });
-
-      overlay.addEventListener('click', e => {
-        if (e.target === overlay) {
-          overlay.classList.remove('active');
-          burger.setAttribute('aria-expanded', 'false');
-          overlay.setAttribute('aria-hidden', 'true');
+        // создаём/используем backdrop
+        let backdrop = document.querySelector('.menu-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'menu-backdrop';
+            document.body.appendChild(backdrop);
         }
-      });
 
-      overlay.querySelectorAll('.mobile-nav a').forEach(a => {
-        a.addEventListener('click', () => {
-          overlay.classList.remove('active');
-          burger.setAttribute('aria-expanded', 'false');
-          overlay.setAttribute('aria-hidden', 'true');
+        // если меню вдруг оказалось внутри header — вынесем в body
+        if (menu && menu.parentElement !== document.body) {
+            document.body.appendChild(menu);
+        }
+
+        const openMenu  = () => {
+            menu.classList.add('show');
+            backdrop.classList.add('show');
+            burger?.classList.add('active');
+            burger?.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        };
+        const closeMenu = () => {
+            menu.classList.remove('show');
+            backdrop.classList.remove('show');
+            burger?.classList.remove('active');
+            burger?.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        };
+
+        burger?.addEventListener('click', () => {
+            const opened = menu.classList.contains('show');
+            opened ? closeMenu() : openMenu();
         });
-      });
+        close?.addEventListener('click', closeMenu);
+        backdrop.addEventListener('click', closeMenu);
+        menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
     });
-  </script>
+</script>
+
 </body>
 </html>
