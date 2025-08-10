@@ -7,592 +7,716 @@
     <link rel="icon" type="image/png" href="static/img/logosite.svg?v=1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-/* ===============================
-   BASE / RESET
-   =============================== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  height: 100%;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background: #0f0f0f;
-  color: white;
-  line-height: 1.4;
-}
-
-/* Звёздный фон */
-canvas#stars {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-/* Ссылки */
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* ===============================
-   HEADER (фиксированный)
-   =============================== */
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 80px;
-  padding: 0 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  background: transparent; /* фон прозрачный, под ним звезды */
-}
-
-.header-inner {
-  width: 100%;
-  max-width: 1300px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-container { /* у тебя это есть – оставляю, чтобы не ломать */
-  width: 100%;
-  max-width: 1300px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 30px;
-}
-
-/* Лого */
-.logo-link {
-  display: inline-block;
-}
-
-.logo {
-  width: 160px;
-  height: auto;
-}
-
-/* Навигация (ПК) */
-.nav {
-  display: flex;
-  gap: 30px;
-}
-
-.nav a {
-  color: #ccc;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.nav a:hover {
-  color: #fff;
-}
-
-/* Правая часть (профиль/регистрация + языки) */
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-/* Кнопка профиль/регистрация */
-.contact-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  border: 1px solid #444;
-  border-radius: 50px;
-  color: #ccc;
-  text-decoration: none;
-  transition: border-color 0.2s ease, background 0.2s ease;
-  white-space: nowrap;
-}
-
-.contact-btn img {
-  width: 22px;
-  height: 22px;
-}
-
-.contact-btn:hover {
-  border-color: #777;
-  background: rgba(255,255,255,0.04);
-}
-
-/* Языки */
-.language-icons {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-left: 20px;
-}
-
-.lang-icon {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  opacity: 0.4;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  user-select: none;
-}
-
-.lang-icon.active {
-  opacity: 1;
-  transform: none;
-}
-
-.lang-icon:hover {
-  opacity: 0.8;
-}
-
-/* Бургер (скрыт на ПК, показывается на мобилке) */
-.burger {
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 26px;
-  height: 20px;
-  cursor: pointer;
-  z-index: 1001;
-  background: transparent;
-  border: 0;
-}
-
-.burger span {
-  display: block;
-  height: 3px;
-  width: 100%;
-  background-color: white;
-  border-radius: 2px;
-  transition: 0.3s;
-}
-
-/* Мобильное меню-оверлей */
-.mobile-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(6px);
-  z-index: 1000;
-}
-
-.mobile-overlay.active {
-  display: flex;
-  justify-content: flex-start;
-}
-
-/* Панель меню слева */
-.mobile-menu {
-  background-color: #1b1b1e;
-  width: 70%;
-  max-width: 320px;
-  padding: 80px 20px;
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.5);
-  transform: translateX(-100%);
-  animation: slideIn 0.3s forwards;
-  border-right: 1px solid rgba(255,255,255,0.06);
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-
-@keyframes slideIn {
-  to { transform: translateX(0); }
-}
-
-.mobile-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.mobile-nav a {
-  font-size: 18px;
-  color: white;
-  text-decoration: none;
-  transition: 0.2s;
-}
-
-.mobile-nav a:hover {
-  opacity: 0.85;
-  transform: translateX(4px);
-}
-
-/* Класс для скрытия элемента на мобилке (например, .contact-btn) */
-.desktop-only {
-  display: inline-flex;
-}
-
-/* ===============================
-   CONTENT WRAPPER
-   =============================== */
-.container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;            /* центрирование на ПК */
-  padding-top: 80px;            /* запас под фикс-хедер (ПК) */
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-/* Главная карточка */
-.signal-wrapper {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 24px;
-  padding: 40px;
-  display: flex;
-  gap: 60px;
-  max-width: 1300px;
-  width: 100%;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 0 30px rgba(0,0,0,0.3);
-}
-
-/* Левая и правая колонки (ПК) */
-.left-block {
-  flex: 1;
-}
-
-.right-block {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  width: 280px;
-}
-
-/* Текстовые блоки */
-.title {
-  font-size: 20px;
-  margin-bottom: 14px;
-  color: #ffffff;
-}
-
-.note {
-  font-size: 15px;
-  color: #d6b900;
-  margin-bottom: 20px;
-}
-
-/* TradingView */
-.tradingview-widget-container {
-  width: 100%;
-}
-
-#tradingview_chart {
-  width: 100%;
-  height: 500px; /* ПК-высота */
-}
-
-/* Карточки-инфобоксы справа */
-.info-box {
-  background: #1f1f1f;
-  border-radius: 16px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.info-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
-}
-
-.info-box span.value {
-  display: block;
-  margin-top: 10px;
-  font-size: 20px;
-  font-weight: 600;
-  color: #fff;
-}
-
-/* Валютные флаги и пара */
-.pair-flag {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
-}
-
-.flag {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  object-fit: cover;
-  background-color: #fff;
-}
-
-/* Кнопка */
-.reset-btn {
-  background: linear-gradient(135deg, #d44aff, #6f4aff);
-  color: white;
-  font-size: 16px;
-  border: none;
-  border-radius: 50px;
-  padding: 16px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: opacity 0.3s ease, transform 0.05s ease;
-}
-
-.reset-btn:hover {
-  opacity: 0.9;
-}
-
-.reset-btn:active {
-  transform: translateY(1px);
-}
-
-/* Подпись снизу */
-.info-text {
-  margin-top: 10px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.6;
-  text-align: left;
-  max-width: 100%;
-  opacity: 0.3;
-}
-
-/* Лого внизу карточки (ПК) */
-.logo-wrapper {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-}
-
-.logo-wrapper img {
-  height: 20px;
-  opacity: 0.6;
-}
-
-/* ===============================
-   MOBILE ADAPTATION
-   =============================== */
-@media (max-width: 768px) {
-
-  /* Хедер */
-  .header {
-    height: 60px;
-    padding: 0 16px;
-  }
-
-  .header-inner,
-  .header-container {
-    padding: 0;
-    justify-content: space-between;
-  }
-
-  .logo {
-    width: 170px;
-  }
-
-  .nav {
-    display: none; /* прячем навигацию в хедере на мобилке */
-  }
-
-  .contact-btn,
-  .desktop-only {
-    display: none !important; /* прячем Профиль/Регистрация на мобиле */
-  }
-
-  .language-icons {
-    margin-left: 0;
-    gap: 8px;
-  }
-
-  .burger {
-    display: flex; /* показать бургер */
-  }
-
-  /* Контент */
-  .container {
-    align-items: flex-start;     /* перестаем вертикально центрировать */
-    min-height: auto;
-    padding-top: 90px;           /* отступ под фиксированный хедер */
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 40px;
-  }
-
-  .signal-wrapper {
-    flex-direction: column;
-    padding: 24px 20px;
-    gap: 20px;
-    border-radius: 20px;
-    max-width: 480px;
-    margin: 0 auto;
-    backdrop-filter: blur(10px);
-  }
-
-  .left-block,
-  .right-block {
-    width: 100%;
-  }
-
-  .title {
-    font-size: 16px;
-    text-align: left;
-    margin-bottom: 10px;
-  }
-
-  .note {
-    font-size: 13px;
-    text-align: left;
-    margin-bottom: 12px;
-    color: #ffc700; /* по мокапу ярче */
-  }
-
-  #tradingview_chart {
-    height: 320px !important; /* компактная высота для мобилок */
-  }
-
-  .right-block {
-    gap: 16px;
-  }
-
-  .info-box {
-    padding: 14px;
-  }
-
-  .info-box span.value {
-    font-size: 18px;
-  }
-
-  .flag {
-    width: 20px;
-    height: 20px;
-  }
-
-  .reset-btn {
-    width: 100%;
-    padding: 14px;
-    font-size: 16px;
-    font-weight: 600;
-
-  }
-
-  .info-text {
-    text-align: center;
-    font-size: 12px;
-    opacity: 1;
-    color: rgba(255,255,255,0.6);
-  }
-
-  .logo-wrapper {
-    display: none; /* логотип внизу карточки скрываем на мобилке */
-  }
-}
-
-@media (max-width: 768px) {
-  #tradingview_chart {
-    height: 240px !important; /* уменьшаем высоту графика */
-  }
-
-  .tradingview-widget-container {
-    max-width: 100%;
-    overflow: hidden;
-    border-radius: 12px; /* закруглим, чтобы выглядело аккуратно */
-  }
-}
-
-.header {
-  transition: transform 0.3s ease;
-}
+        /* ===============================
+           BASE / RESET
+           =============================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f0f0f;
+            color: white;
+            line-height: 1.4;
+        }
+
+        /* Звёздный фон */
+        canvas#stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Ссылки */
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* ===============================
+           HEADER (фиксированный)
+           =============================== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            padding: 0 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            background: transparent; /* фон прозрачный, под ним звезды */
+        }
+
+        .header-inner {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-container { /* у тебя это есть – оставляю, чтобы не ломать */
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        /* Лого */
+        .logo-link {
+            display: inline-block;
+        }
+
+        .logo {
+            width: 160px;
+            height: auto;
+        }
+
+        /* Навигация (ПК) */
+        .nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav a:hover {
+            color: #fff;
+        }
+
+        /* Правая часть (профиль/регистрация + языки) */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Кнопка профиль/регистрация */
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            border: 1px solid #444;
+            border-radius: 50px;
+            color: #ccc;
+            text-decoration: none;
+            transition: border-color 0.2s ease, background 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .contact-btn img {
+            width: 22px;
+            height: 22px;
+        }
+
+        .contact-btn:hover {
+            border-color: #777;
+            background: rgba(255,255,255,0.04);
+        }
+
+        /* Языки */
+        .language-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-left: 20px;
+        }
+
+        .lang-icon {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            user-select: none;
+        }
+
+        .lang-icon.active {
+            opacity: 1;
+            transform: none;
+        }
+
+        .lang-icon:hover {
+            opacity: 0.8;
+        }
+
+        /* Бургер (скрыт на ПК, показывается на мобилке) */
+        .burger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 26px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            background: transparent;
+            border: 0;
+        }
+
+        .burger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        /* Мобильное меню-оверлей */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+        }
+
+        .mobile-overlay.active {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        /* Панель меню слева */
+        .mobile-menu {
+            background-color: #1b1b1e;
+            width: 70%;
+            max-width: 320px;
+            padding: 80px 20px;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.5);
+            transform: translateX(-100%);
+            animation: slideIn 0.3s forwards;
+            border-right: 1px solid rgba(255,255,255,0.06);
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        @keyframes slideIn {
+            to { transform: translateX(0); }
+        }
+
+        .mobile-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .mobile-nav a {
+            font-size: 18px;
+            color: white;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .mobile-nav a:hover {
+            opacity: 0.85;
+            transform: translateX(4px);
+        }
+
+        /* Класс для скрытия элемента на мобилке (например, .contact-btn) */
+        .desktop-only {
+            display: inline-flex;
+        }
+
+        /* ===============================
+           CONTENT WRAPPER
+           =============================== */
+        .container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;            /* центрирование на ПК */
+            padding-top: 80px;            /* запас под фикс-хедер (ПК) */
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        /* Главная карточка */
+        .signal-wrapper {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 40px;
+            display: flex;
+            gap: 60px;
+            max-width: 1300px;
+            width: 100%;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        /* Левая и правая колонки (ПК) */
+        .left-block {
+            flex: 1;
+        }
+
+        .right-block {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            width: 280px;
+        }
+
+        /* Текстовые блоки */
+        .title {
+            font-size: 20px;
+            margin-bottom: 14px;
+            color: #ffffff;
+        }
+
+        .note {
+            font-size: 15px;
+            color: #d6b900;
+            margin-bottom: 20px;
+        }
+
+        /* TradingView */
+        .tradingview-widget-container {
+            width: 100%;
+        }
+
+        #tradingview_chart {
+            width: 100%;
+            height: 500px; /* ПК-высота */
+        }
+
+        /* Карточки-инфобоксы справа */
+        .info-box {
+            background: #1f1f1f;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+        }
+
+        .info-box span.value {
+            display: block;
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Валютные флаги и пара */
+        .pair-flag {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .flag {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #fff;
+        }
+
+        /* Кнопка */
+        .reset-btn {
+            background: linear-gradient(135deg, #d44aff, #6f4aff);
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 50px;
+            padding: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.3s ease, transform 0.05s ease;
+        }
+
+        .reset-btn:hover {
+            opacity: 0.9;
+        }
+
+        .reset-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Подпись снизу */
+        .info-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            text-align: left;
+            max-width: 100%;
+            opacity: 0.3;
+        }
+
+        /* Лого внизу карточки (ПК) */
+        .logo-wrapper {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logo-wrapper img {
+            height: 20px;
+            opacity: 0.6;
+        }
+
+        /* ===============================
+           MOBILE ADAPTATION
+           =============================== */
+        @media (max-width: 768px) {
+
+            /* Хедер */
+            .header {
+                height: 60px;
+                padding: 0 16px;
+            }
+
+            .header-inner,
+            .header-container {
+                padding: 0;
+                justify-content: space-between;
+            }
+
+            .logo {
+                width: 170px;
+            }
+
+            .nav {
+                display: none; /* прячем навигацию в хедере на мобилке */
+            }
+
+            .contact-btn,
+            .desktop-only {
+                display: none !important; /* прячем Профиль/Регистрация на мобиле */
+            }
+
+            .language-icons {
+                margin-left: 0;
+                gap: 8px;
+            }
+
+            .burger {
+                display: flex; /* показать бургер */
+            }
+
+            /* Контент */
+            .container {
+                align-items: flex-start;     /* перестаем вертикально центрировать */
+                min-height: auto;
+                padding-top: 90px;           /* отступ под фиксированный хедер */
+                padding-left: 16px;
+                padding-right: 16px;
+                padding-bottom: 40px;
+            }
+
+            .signal-wrapper {
+                flex-direction: column;
+                padding: 24px 20px;
+                gap: 20px;
+                border-radius: 20px;
+                max-width: 480px;
+                margin: 0 auto;
+                backdrop-filter: blur(10px);
+            }
+
+            .left-block,
+            .right-block {
+                width: 100%;
+            }
+
+            .title {
+                font-size: 16px;
+                text-align: left;
+                margin-bottom: 10px;
+            }
+
+            .note {
+                font-size: 13px;
+                text-align: left;
+                margin-bottom: 12px;
+                color: #ffc700; /* по мокапу ярче */
+            }
+
+            #tradingview_chart {
+                height: 320px !important; /* компактная высота для мобилок */
+            }
+
+            .right-block {
+                gap: 16px;
+            }
+
+            .info-box {
+                padding: 14px;
+            }
+
+            .info-box span.value {
+                font-size: 18px;
+            }
+
+            .flag {
+                width: 20px;
+                height: 20px;
+            }
+
+            .reset-btn {
+                width: 100%;
+                padding: 14px;
+                font-size: 16px;
+                font-weight: 600;
+
+            }
+
+            .info-text {
+                text-align: center;
+                font-size: 12px;
+                opacity: 1;
+                color: rgba(255,255,255,0.6);
+            }
+
+            .logo-wrapper {
+                display: none; /* логотип внизу карточки скрываем на мобилке */
+            }
+        }
+
+        @media (max-width: 768px) {
+            #tradingview_chart {
+                height: 240px !important; /* уменьшаем высоту графика */
+            }
+
+            .tradingview-widget-container {
+                max-width: 100%;
+                overflow: hidden;
+                border-radius: 12px; /* закруглим, чтобы выглядело аккуратно */
+            }
+        }
+
+        .header {
+            transition: transform 0.3s ease;
+        }
+
+
+
+        /* === HEADER (layout как на index) === */
+
+        /* сетка: logo | nav | btn | langs на десктопе */
+        .header .container.header-inner,
+        .header-inner {
+            display: grid !important;
+            grid-template-columns: auto 1fr auto auto;
+            align-items: center;
+            column-gap: 24px;
+            height: 80px;
+        }
+
+        .burger-btn { display: none; }
+
+        .logo-link      { grid-column: 1; justify-self: start; }
+        .nav            { grid-column: 2; justify-self: center; display: flex; gap: 28px; white-space: nowrap; }
+        .header-right   { grid-column: 3; justify-self: end; }
+        .language-icons { grid-column: 4; justify-self: end; }
+
+        .nav a { color:#ccc; transition:color .2s; }
+        .nav a:hover { color:#fff; }
+
+        /* мобильный вид: бургер | лого | языки */
+        @media (max-width: 768px) {
+            .header { height: 60px; }
+            .header .container.header-inner,
+            .header-inner {
+                grid-template-columns: 28px 1fr auto;
+                height: 60px; padding: 0 12px;
+            }
+
+            .burger-btn { display: block; }
+            .logo-link { grid-column: 2; justify-self: center; }
+            .language-icons { grid-column: 3; justify-self: end; gap:10px; }
+
+            .nav, .header-right { display: none !important; } /* на мобилке в меню */
+        }
+
+        /* красивое мобильное меню + деликатные разделители */
+        .mobile-menu{
+            position:fixed; top:0; left:-74%;
+            width:74%; max-width:340px; height:100%;
+            background:#111;
+            padding:78px 20px 24px;
+            display:flex; flex-direction:column; gap:10px;
+            border-right:1px solid rgba(255,255,255,.06);
+            border-top-right-radius:14px; border-bottom-right-radius:14px;
+            box-shadow:6px 0 24px rgba(0,0,0,.45);
+            z-index:2200; transition:left .3s ease;
+            background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0) 60%), #111;
+        }
+        .mobile-menu.show{ left:0; }
+
+        .close-btn{
+            position:absolute; top:16px; right:16px;
+            width:32px; height:32px; border-radius:8px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:22px; line-height:1; color:#fff; cursor:pointer;
+            background:rgba(255,255,255,.06);
+            border:1px solid rgba(255,255,255,.08);
+            transition:background .2s ease, transform .1s ease;
+        }
+        .close-btn:hover{ background:rgba(255,255,255,.1); }
+        .close-btn:active{ transform:scale(.96); }
+
+        .mobile-menu .mobile-nav a{
+            color:#fff; text-decoration:none; font-size:18px; font-weight:500;
+            padding:14px 10px; border-radius:10px; position:relative;
+            transition:background .2s ease, transform .08s ease;
+        }
+        .mobile-menu .mobile-nav a::after{
+            content:""; position:absolute; left:0; right:0; bottom:0;
+            height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+        }
+        .mobile-menu .mobile-nav a:last-child::after{ display:none; }
+        .mobile-menu .mobile-nav a:hover{ background:rgba(255,255,255,.06); }
+        .mobile-menu .mobile-nav a:active{ transform:translateY(1px); }
+
+        /* CTA-кнопка профиля/регистрации внутри меню */
+        .mobile-menu .menu-cta{
+            display:block !important;
+            color:#fff;
+            padding:14px 10px;
+            border:1px solid rgba(255,255,255,.12);
+            border-radius:10px;
+            margin:6px 0 12px;
+            text-decoration:none;
+        }
+
+        /* бургер 3 полоски -> крестик */
+        .burger-btn{
+            appearance:none;border:0;background:transparent;cursor:pointer;
+            width:28px;height:22px;position:relative;z-index:2100;padding:0;margin:0;
+        }
+        .burger-btn span{
+            position:absolute;left:0;width:100%;height:2px;border-radius:1px;
+            background:#fff;transition:transform .25s ease, top .25s ease, opacity .2s ease;
+        }
+        .burger-btn span:nth-child(1){ top:0; }
+        .burger-btn span:nth-child(2){ top:10px; }
+        .burger-btn span:nth-child(3){ top:20px; }
+        .burger-btn.active span:nth-child(1){ top:10px; transform:rotate(45deg); }
+        .burger-btn.active span:nth-child(2){ opacity:0; }
+        .burger-btn.active span:nth-child(3){ top:10px; transform:rotate(-45deg); }
+
+        /* полупрозрачный фон (создаётся скриптом) */
+        .menu-backdrop{
+            position:fixed; inset:0; background:rgba(0,0,0,.5);
+            opacity:0; pointer-events:none; transition:opacity .25s ease;
+            z-index:1500;
+        }
+        .menu-backdrop.show{ opacity:1; pointer-events:auto; }
+
+        /* ВАЖНО: на auth у тебя фон чёрный, поэтому шапка видна; margin у header-text рассчитан на fixed-хедер. Оставляем fixed. */
+
+        /* Фикс: контейнер внутри хедера НЕ должен наследовать min-height и flex */
+        .header .container,
+        .header-inner {
+            min-height: 0 !important;    /* сбиваем 100vh */
+            height: 80px;                 /* высота хедера на десктопе */
+            display: grid !important;     /* наш грид для хедера */
+            align-items: center;
+            justify-content: normal;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header .container,
+            .header-inner {
+                height: 60px;               /* высота на мобилке */
+                padding: 0 12px;
+            }
+        }
+
 
     </style>
-    </head>
+</head>
 <body>
 <canvas id="stars"></canvas>
 
 <header class="header">
-  <div class="header-container header-inner">
+    <div class="container header-inner">
 
-    <!-- Бургер (мобилка) -->
-    <button id="burger-button" class="burger" aria-label="Открыть меню" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+        <button id="burger" class="burger-btn" aria-label="Открыть меню" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
 
-    <!-- Логотип по центру -->
-    <a href="/" class="logo-link" aria-label="QOMEX Home">
-      <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
-    </a>
+        <div class="mobile-menu" id="mobileMenu">
+            <button class="close-btn" id="closeMenu" aria-label="Закрыть">×</button>
 
-    <!-- Десктопная навигация -->
-    <nav class="nav" role="navigation" aria-label="Главная навигация">
-      <a href="/#about" data-i18n="header_about">О софте</a>
-      <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
-      <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-      <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+            {% if request.cookies.get('user_email') %}
+            <a href="/profile" class="menu-cta" data-i18n="header_profile">Профиль</a>
+            {% else %}
+            <a href="/auth" class="menu-cta" data-i18n="header_register">Зарегистрироваться</a>
+            {% endif %}
 
-    </nav>
+            <nav class="mobile-nav">
+                <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+                <a href="/#about" data-i18n="header_about">О софте</a>
+                <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+                <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+            </nav>
+        </div>
 
-    <!-- Правый блок: профиль (только ПК) + языки -->
-    <div class="header-right">
-      {% if request.cookies.get("user_email") %}
-      <a href="/profile" class="contact-btn desktop-only">
-        <span data-i18n="header_profile">Профиль</span>
+        <a href="/" class="logo-link">
+            <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+        </a>
 
-      </a>
-      {% else %}
-      <a href="/auth" class="contact-btn desktop-only">
-        <span data-i18n="header_register">Зарегистрироваться</span>
-      </a>
-      {% endif %}
+        <nav class="nav">
+            <a href="/#about" data-i18n="header_about">О софте</a>
+            <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+            <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+            <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+        </nav>
 
-      <div class="language-icons">
-        <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
-        <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
-        <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
-      </div>
+        <div class="header-right">
+            {% if request.cookies.get("user_email") %}
+            <a href="/profile" class="contact-btn">
+                <span data-i18n="header_profile">Профиль</span>
+            </a>
+            {% else %}
+            <a href="/auth" class="contact-btn">
+                <span data-i18n="header_register">Зарегистрироваться</span>
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="language-icons">
+            <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+            <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+            <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
+        </div>
     </div>
-  </div>
-
-  <!-- Мобильное меню (без кнопки Профиль/Регистрация) -->
-  <!-- Мобильное меню -->
-<div class="mobile-overlay" id="mobile-overlay">
-  <div class="mobile-menu">
-    <nav class="mobile-nav" aria-label="Мобильное меню">
-      <a href="/#about" data-i18n="header_about">О софте</a>
-      <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
-      <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-      <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
-
-      <!-- Кнопка профиля/регистрации для мобилки -->
-      {% if request.cookies.get("user_email") %}
-        <a href="/profile" class="mobile-btn">
-          <span data-i18n="header_profile">Профиль</span>
-        </a>
-      {% else %}
-        <a href="/auth" class="mobile-btn">
-          <span data-i18n="header_register">Зарегистрироваться</span>
-        </a>
-      {% endif %}
-    </nav>
-  </div>
-</div>
-
 </header>
+
 
 
 <div class="container">
@@ -639,47 +763,47 @@ a {
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const burger = document.getElementById('burger-button');
-  const overlay = document.getElementById('mobile-overlay');
+    document.addEventListener('DOMContentLoaded', () => {
+        const burger = document.getElementById('burger-button');
+        const overlay = document.getElementById('mobile-overlay');
 
-  if (burger && overlay) {
-    burger.addEventListener('click', () => {
-      const isOpen = overlay.classList.toggle('active');
-      burger.setAttribute('aria-expanded', String(isOpen));
-    });
+        if (burger && overlay) {
+            burger.addEventListener('click', () => {
+                const isOpen = overlay.classList.toggle('active');
+                burger.setAttribute('aria-expanded', String(isOpen));
+            });
 
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        overlay.classList.remove('active');
-        burger.setAttribute('aria-expanded', 'false');
-      }
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                    burger.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
     });
-  }
-});
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  let lastScrollTop = 0;
-  const header = document.querySelector(".header");
+    document.addEventListener("DOMContentLoaded", function () {
+        let lastScrollTop = 0;
+        const header = document.querySelector(".header");
 
-  window.addEventListener("scroll", function () {
-    let scrollTop = window.scrollY || document.documentElement.scrollTop;
+        window.addEventListener("scroll", function () {
+            let scrollTop = window.scrollY || document.documentElement.scrollTop;
 
-    if (window.innerWidth <= 768) { // Только для мобилок
-      if (scrollTop > lastScrollTop) {
-        // Скролл вниз — прячем хедер
-        header.style.transform = "translateY(-100%)";
-      } else {
-        // Скролл вверх — показываем хедер
-        header.style.transform = "translateY(0)";
-      }
-    }
+            if (window.innerWidth <= 768) { // Только для мобилок
+                if (scrollTop > lastScrollTop) {
+                    // Скролл вниз — прячем хедер
+                    header.style.transform = "translateY(-100%)";
+                } else {
+                    // Скролл вверх — показываем хедер
+                    header.style.transform = "translateY(0)";
+                }
+            }
 
-    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // защита от отрицательных значений
-  });
-});
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // защита от отрицательных значений
+        });
+    });
 </script>
 
 <script>
@@ -821,92 +945,136 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('dir-icon').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-miterlimit="5.759" d="M3 3v16a2 2 0 0 0 2 2h16"/><path stroke-miterlimit="5.759" d="m7 14l4-4l4 4l6-6"/><path d="M18 8h3v3"/></g></svg>`;
 </script>
 
-    <script>
-  const translations = {
-    "ru": {
-      "header_about": "О софте",
-      "header_risks": "Виды риска",
-      "header_signals": "Сигналы",
-      "header_instruction": "Инструкция",
-      "header_profile": "Профиль",
-      "header_register": "Зарегистрироваться",
-      "dashboard_title": "Получай сигналы для торговли на PocketOption от QOMEXtrading",
-      "dashboard_note": "*Торговля валютными парами типа Market не доступна для торгов!",
-      "currency_pair": "Валютная пара",
-      "potential": "Потенциал",
-      "timeframe": "Таймфрейм",
-      "get_signal": "Получить сигнал",
-      "info_text": "*Используй сигналы, чтобы увеличить доходность на PocketOption. Алгоритмы QOMEX подберут лучшие моменты входа. Все данные защищены."
-    },
-    "en": {
-      "header_about": "About",
-      "header_risks": "Risk Types",
-      "header_signals": "Signals",
-      "header_instruction": "Instruction",
-      "header_profile": "Profile",
-      "header_register": "Register",
-      "dashboard_title": "Get trading signals for PocketOption from QOMEXtrading",
-      "dashboard_note": "*Trading market-type currency pairs is not available!",
-      "currency_pair": "Currency pair",
-      "potential": "Potential",
-      "timeframe": "Timeframe",
-      "get_signal": "Get Signal",
-      "info_text": "*Use signals to increase profitability on PocketOption. QOMEX algorithms will find the best entry points. All data is secured."
-    },
-    "ua": {
-      "header_about": "Про софт",
-      "header_risks": "Види ризику",
-      "header_signals": "Сигнали",
-      "header_instruction": "Інструкція",
-      "header_profile": "Профіль",
-      "header_register": "Зареєструватися",
-      "dashboard_title": "Отримуй сигнали для торгівлі на PocketOption від QOMEXtrading",
-      "dashboard_note": "*Торгівля валютними парами типу Market недоступна!",
-      "currency_pair": "Валютна пара",
-      "potential": "Потенціал",
-      "timeframe": "Таймфрейм",
-      "get_signal": "Отримати сигнал",
-      "info_text": "*Використовуйте сигнали для підвищення прибутковості на PocketOption. Алгоритми QOMEX підберуть найкращі моменти входу. Дані захищено."
+<script>
+    const translations = {
+        "ru": {
+            "header_about": "О софте",
+            "header_risks": "Виды риска",
+            "header_signals": "Сигналы",
+            "header_instruction": "Инструкция",
+            "header_profile": "Профиль",
+            "header_register": "Зарегистрироваться",
+            "dashboard_title": "Получай сигналы для торговли на PocketOption от QOMEXtrading",
+            "dashboard_note": "*Торговля валютными парами типа Market не доступна для торгов!",
+            "currency_pair": "Валютная пара",
+            "potential": "Потенциал",
+            "timeframe": "Таймфрейм",
+            "get_signal": "Получить сигнал",
+            "info_text": "*Используй сигналы, чтобы увеличить доходность на PocketOption. Алгоритмы QOMEX подберут лучшие моменты входа. Все данные защищены."
+        },
+        "en": {
+            "header_about": "About",
+            "header_risks": "Risk Types",
+            "header_signals": "Signals",
+            "header_instruction": "Instruction",
+            "header_profile": "Profile",
+            "header_register": "Register",
+            "dashboard_title": "Get trading signals for PocketOption from QOMEXtrading",
+            "dashboard_note": "*Trading market-type currency pairs is not available!",
+            "currency_pair": "Currency pair",
+            "potential": "Potential",
+            "timeframe": "Timeframe",
+            "get_signal": "Get Signal",
+            "info_text": "*Use signals to increase profitability on PocketOption. QOMEX algorithms will find the best entry points. All data is secured."
+        },
+        "ua": {
+            "header_about": "Про софт",
+            "header_risks": "Види ризику",
+            "header_signals": "Сигнали",
+            "header_instruction": "Інструкція",
+            "header_profile": "Профіль",
+            "header_register": "Зареєструватися",
+            "dashboard_title": "Отримуй сигнали для торгівлі на PocketOption від QOMEXtrading",
+            "dashboard_note": "*Торгівля валютними парами типу Market недоступна!",
+            "currency_pair": "Валютна пара",
+            "potential": "Потенціал",
+            "timeframe": "Таймфрейм",
+            "get_signal": "Отримати сигнал",
+            "info_text": "*Використовуйте сигнали для підвищення прибутковості на PocketOption. Алгоритми QOMEX підберуть найкращі моменти входу. Дані захищено."
+        }
+    };
+
+    function applyTranslations(lang) {
+        const t = translations[lang];
+        if (!t) return;
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (t[key]) el.textContent = t[key];
+        });
     }
-  };
 
-  function applyTranslations(lang) {
-    const t = translations[lang];
-    if (!t) return;
+    function setLanguage(lang) {
+        localStorage.setItem('language', lang);
+        applyTranslations(lang);
+        document.querySelectorAll('.lang-icon').forEach(icon => {
+            icon.classList.toggle('active', icon.dataset.lang === lang);
+        });
+    }
 
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (t[key]) el.textContent = t[key];
+    document.addEventListener('DOMContentLoaded', () => {
+        const lang = localStorage.getItem('language') || 'ru';
+        applyTranslations(lang);
+        setLanguage(lang);
+
+        document.querySelectorAll('.lang-icon').forEach(icon => {
+            icon.addEventListener('click', () => setLanguage(icon.dataset.lang));
+        });
+
+        // Проставим переводы для нестатичных блоков вручную:
+        document.querySelector(".title").setAttribute("data-i18n", "dashboard_title");
+        document.querySelector(".note").setAttribute("data-i18n", "dashboard_note");
+        document.querySelector(".reset-btn").setAttribute("data-i18n", "get_signal");
+        document.querySelector(".info-text").setAttribute("data-i18n", "info_text");
+
+
     });
-  }
-
-  function setLanguage(lang) {
-    localStorage.setItem('language', lang);
-    applyTranslations(lang);
-    document.querySelectorAll('.lang-icon').forEach(icon => {
-      icon.classList.toggle('active', icon.dataset.lang === lang);
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const lang = localStorage.getItem('language') || 'ru';
-    applyTranslations(lang);
-    setLanguage(lang);
-
-    document.querySelectorAll('.lang-icon').forEach(icon => {
-      icon.addEventListener('click', () => setLanguage(icon.dataset.lang));
-    });
-
-    // Проставим переводы для нестатичных блоков вручную:
-    document.querySelector(".title").setAttribute("data-i18n", "dashboard_title");
-    document.querySelector(".note").setAttribute("data-i18n", "dashboard_note");
-    document.querySelector(".reset-btn").setAttribute("data-i18n", "get_signal");
-    document.querySelector(".info-text").setAttribute("data-i18n", "info_text");
-
-
-  });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const burger = document.getElementById('burger');
+        const menu   = document.getElementById('mobileMenu');
+        const close  = document.getElementById('closeMenu');
+
+        // создаём/используем backdrop
+        let backdrop = document.querySelector('.menu-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'menu-backdrop';
+            document.body.appendChild(backdrop);
+        }
+
+        // если меню вдруг оказалось внутри header — вынесем в body
+        if (menu && menu.parentElement !== document.body) {
+            document.body.appendChild(menu);
+        }
+
+        const openMenu  = () => {
+            menu.classList.add('show');
+            backdrop.classList.add('show');
+            burger?.classList.add('active');
+            burger?.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        };
+        const closeMenu = () => {
+            menu.classList.remove('show');
+            backdrop.classList.remove('show');
+            burger?.classList.remove('active');
+            burger?.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        };
+
+        burger?.addEventListener('click', () => {
+            const opened = menu.classList.contains('show');
+            opened ? closeMenu() : openMenu();
+        });
+        close?.addEventListener('click', closeMenu);
+        backdrop.addEventListener('click', closeMenu);
+        menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+    });
+</script>
 
 
 </body>
