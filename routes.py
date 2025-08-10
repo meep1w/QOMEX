@@ -60,3 +60,39 @@ def go_broker(request: Request):
     resp.set_cookie("click_id", cid, max_age=60*60*24*30,
                     secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
     return resp
+
+
+# --- SEO: robots.txt & sitemap.xml ---
+from fastapi.responses import PlainTextResponse, Response
+import os as _os
+
+BASE_URL = _os.getenv("BASE_URL", "https://qomex.top")
+
+@router.get("/robots.txt", response_class=PlainTextResponse)
+def robots():
+    return f"""User-agent: *
+Allow: /
+Disallow: /profile
+Disallow: /auth/reset
+Sitemap: {BASE_URL}/sitemap.xml
+""".strip()
+
+@router.get("/sitemap.xml")
+def sitemap():
+    urls = [
+        "/",              # главная
+        "/auth",
+        "/go-to-signals",
+        "/privacy.html",
+        "/terms.html",
+        "/cookie.html",
+        # добавишь сюда свои новые SEO-страницы, например: "/signals"
+    ]
+    items = "\n".join(f"<url><loc>{BASE_URL}{p}</loc></url>" for p in urls)
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        f"{items}"
+        "</urlset>"
+    )
+    return Response(content=xml, media_type="application/xml")
