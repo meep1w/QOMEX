@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       auth_switch_register: "Нет аккаунта? Зарегистрируйтесь",
 
       auth_reset_title: "Сбросить пароль",
-      auth_reset_instruction: "Введите ваш email для получения ссылки на сброс пароля.",
+      auth_reset_instruction: "Введите ваш email для перехода на страницу сброса пароля.",
       auth_reset_send: "Отправить ссылку",
 
       auth_login_placeholder: "Введите логин",
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
       auth_switch_register: "No account? Register",
 
       auth_reset_title: "Reset password",
-      auth_reset_instruction: "Enter your email to receive a reset link.",
+      auth_reset_instruction: "Enter your email address to go to the password reset page.",
       auth_reset_send: "Send link",
 
       auth_login_placeholder: "Enter login",
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       auth_switch_register: "Немає акаунту? Зареєструйтесь",
 
       auth_reset_title: "Скинути пароль",
-      auth_reset_instruction: "Введіть email для отримання посилання.",
+      auth_reset_instruction: "Введіть свою електронну адресу, щоб перейти на сторінку скидання пароля.",
       auth_reset_send: "Надіслати посилання",
 
       auth_login_placeholder: "Введіть логін",
