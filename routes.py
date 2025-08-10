@@ -65,6 +65,7 @@ def go_broker(request: Request):
 # --- SEO: robots.txt & sitemap.xml ---
 from fastapi.responses import PlainTextResponse, Response
 import os as _os
+from xml.etree.ElementTree import Element, SubElement, tostring  # <-- добавили
 
 BASE_URL = _os.getenv("BASE_URL", "https://qomex.top")
 
@@ -80,19 +81,16 @@ Sitemap: {BASE_URL}/sitemap.xml
 @router.get("/sitemap.xml")
 def sitemap():
     urls = [
-        "/",              # главная
-        "/auth",
-        "/go-to-signals",
-        "/privacy.html",
-        "/terms.html",
-        "/cookie.html",
-        # добавишь сюда свои новые SEO-страницы, например: "/signals"
+        "/", "/auth", "/go-to-signals",
+        "/privacy.html", "/terms.html", "/cookie.html",
+        # сюда можно добавить: "/signals", когда сделаем SEO-страницу
     ]
-    items = "\n".join(f"<url><loc>{BASE_URL}{p}</loc></url>" for p in urls)
-    xml = (
-        '<?xml version="1.0" encoding="UTF-8"?>'
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-        f"{items}"
-        "</urlset>"
-    )
+
+    urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    for path in urls:
+        url = SubElement(urlset, "url")
+        loc = SubElement(url, "loc")
+        loc.text = f"{BASE_URL}{path}"
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>' + tostring(urlset, encoding="unicode")
     return Response(content=xml, media_type="application/xml")
