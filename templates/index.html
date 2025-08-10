@@ -22,24 +22,22 @@
 
 
             <div class="mobile-menu" id="mobileMenu">
-                <div class="close-btn" id="closeMenu">×</div>
-                {% if request.cookies.get("user_email") %}
-                <a href="/profile" class="contact-btn">
-                    <span data-i18n="header_profile">Профиль</span>
+                <button class="close-btn" id="closeMenu" aria-label="Закрыть">×</button>
 
-                </a>
+                {% if request.cookies.get('user_email') %}
+                <a href="/profile" class="menu-cta" data-i18n="header_profile">Профиль</a>
                 {% else %}
-                <a href="/auth" class="contact-btn">
-                    <span data-i18n="header_register">Зарегистрироваться</span>
-
-                </a>
+                <a href="/auth" class="menu-cta" data-i18n="header_register">Зарегистрироваться</a>
                 {% endif %}
-                <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-                <a href="#about" data-i18n="header_about">О софте</a>
-                <a href="#advantages" data-i18n="header_risks">Виды риска</a>
-                <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
 
+                <nav class="mobile-nav">
+                    <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+                    <a href="#about" data-i18n="header_about">О софте</a>
+                    <a href="#advantages" data-i18n="header_risks">Виды риска</a>
+                    <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
+                </nav>
             </div>
+
 
 
             <a href="/" class="logo-link">
@@ -470,10 +468,10 @@
 
     <div class="footer-right">
         <div class="footer-icons">
-            <a href="https://t.me/qomextrading"><img src="/static/img/TgFooter.svg" alt="TG" /></a>
+            <a href="#"><img src="/static/img/TgFooter.svg" alt="TG" /></a>
             <a href="#"><img src="/static/img/Youtube.svg" alt="YT" /></a>
         </div>
-        <div class="footer-email" data-i18n="footer_support">Support: qomexsupp@gmail.com</div>
+        <div class="footer-email" data-i18n="footer_support">Support: qomexsupport@gmail.com</div>
     </div>
 </footer>
 

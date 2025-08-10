@@ -1112,3 +1112,35 @@ main, .page, .container, body > section:first-of-type,
     .nav { gap: 28px; white-space: nowrap; }
     .nav a { display: inline-block; }
 }
+
+/* показываем CTA внутри мобильного меню, даже если contact-btn скрыт в шапке */
+.mobile-menu .contact-btn {
+    display: block !important;
+    color: #fff;
+    padding: 14px 10px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    margin: 6px 0 12px;
+    text-decoration: none;
+}
+
+@media (max-width: 992px) {
+    /* прячем ТОЛЬКО кнопку в правом блоке хедера, а не везде */
+    .header-right .contact-btn { display: none; }
+}
+
+/* CTA в мобильном меню */
+.mobile-menu .menu-cta{
+    display:block !important;
+    color:#fff;
+    padding:14px 10px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;
+    margin:6px 0 12px;
+    text-decoration:none;
+}
+
+/* Скрываем кнопку только в правом блоке хедера, но НЕ в меню */
+@media (max-width: 992px){
+    .header-right .contact-btn{ display:none; }
+}
