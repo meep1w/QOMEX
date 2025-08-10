@@ -10,6 +10,8 @@ templates = Jinja2Templates(directory="templates")
 IS_SECURE_COOKIES = os.getenv("ENV", "dev") != "dev"
 SAMESITE_POLICY = "Lax"
 
+BASE_URL = os.getenv("BASE_URL", "https://qomex.top")
+
 # смарт-рефка БЕЗ click_id — добавим сами
 AFF_URL = "https://u3.shortink.io/smart/16ZjQA8RfjI79Z"
 
@@ -120,4 +122,3 @@ def signals_page(request: Request):
 @router.get("/go-to-signals")
 def go_to_signals():
     return RedirectResponse("/signals", status_code=301)
-
