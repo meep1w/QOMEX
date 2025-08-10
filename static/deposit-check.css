@@ -200,3 +200,136 @@ a { color: inherit; text-decoration: none; }
   .headings p  { font-size: 13px; }
   .form-wrapper { padding: 18px 14px; }
 }
+
+/* === HEADER (layout как на index) === */
+
+/* сетка: logo | nav | btn | langs на десктопе */
+.header .container.header-inner,
+.header-inner {
+  display: grid !important;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  column-gap: 24px;
+  height: 80px;
+}
+
+.burger-btn { display: none; }
+
+.logo-link      { grid-column: 1; justify-self: start; }
+.nav            { grid-column: 2; justify-self: center; display: flex; gap: 28px; white-space: nowrap; }
+.header-right   { grid-column: 3; justify-self: end; }
+.language-icons { grid-column: 4; justify-self: end; }
+
+.nav a { color:#ccc; transition:color .2s; }
+.nav a:hover { color:#fff; }
+
+/* мобильный вид: бургер | лого | языки */
+@media (max-width: 768px) {
+  .header { height: 60px; }
+  .header .container.header-inner,
+  .header-inner {
+    grid-template-columns: 28px 1fr auto;
+    height: 60px; padding: 0 12px;
+  }
+
+  .burger-btn { display: block; }
+  .logo-link { grid-column: 2; justify-self: center; }
+  .language-icons { grid-column: 3; justify-self: end; gap:10px; }
+
+  .nav, .header-right { display: none !important; } /* на мобилке в меню */
+}
+
+/* красивое мобильное меню + деликатные разделители */
+.mobile-menu{
+  position:fixed; top:0; left:-74%;
+  width:74%; max-width:340px; height:100%;
+  background:#111;
+  padding:78px 20px 24px;
+  display:flex; flex-direction:column; gap:10px;
+  border-right:1px solid rgba(255,255,255,.06);
+  border-top-right-radius:14px; border-bottom-right-radius:14px;
+  box-shadow:6px 0 24px rgba(0,0,0,.45);
+  z-index:2200; transition:left .3s ease;
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0) 60%), #111;
+}
+.mobile-menu.show{ left:0; }
+
+.close-btn{
+  position:absolute; top:16px; right:16px;
+  width:32px; height:32px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; line-height:1; color:#fff; cursor:pointer;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  transition:background .2s ease, transform .1s ease;
+}
+.close-btn:hover{ background:rgba(255,255,255,.1); }
+.close-btn:active{ transform:scale(.96); }
+
+.mobile-menu .mobile-nav a{
+  color:#fff; text-decoration:none; font-size:18px; font-weight:500;
+  padding:14px 10px; border-radius:10px; position:relative;
+  transition:background .2s ease, transform .08s ease;
+}
+.mobile-menu .mobile-nav a::after{
+  content:""; position:absolute; left:0; right:0; bottom:0;
+  height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+}
+.mobile-menu .mobile-nav a:last-child::after{ display:none; }
+.mobile-menu .mobile-nav a:hover{ background:rgba(255,255,255,.06); }
+.mobile-menu .mobile-nav a:active{ transform:translateY(1px); }
+
+/* CTA-кнопка профиля/регистрации внутри меню */
+.mobile-menu .menu-cta{
+  display:block !important;
+  color:#fff;
+  padding:14px 10px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+  margin:6px 0 12px;
+  text-decoration:none;
+}
+
+/* бургер 3 полоски -> крестик */
+.burger-btn{
+  appearance:none;border:0;background:transparent;cursor:pointer;
+  width:28px;height:22px;position:relative;z-index:2100;padding:0;margin:0;
+}
+.burger-btn span{
+  position:absolute;left:0;width:100%;height:2px;border-radius:1px;
+  background:#fff;transition:transform .25s ease, top .25s ease, opacity .2s ease;
+}
+.burger-btn span:nth-child(1){ top:0; }
+.burger-btn span:nth-child(2){ top:10px; }
+.burger-btn span:nth-child(3){ top:20px; }
+.burger-btn.active span:nth-child(1){ top:10px; transform:rotate(45deg); }
+.burger-btn.active span:nth-child(2){ opacity:0; }
+.burger-btn.active span:nth-child(3){ top:10px; transform:rotate(-45deg); }
+
+/* полупрозрачный фон (создаётся скриптом) */
+.menu-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.5);
+  opacity:0; pointer-events:none; transition:opacity .25s ease;
+  z-index:1500;
+}
+.menu-backdrop.show{ opacity:1; pointer-events:auto; }
+
+/* ВАЖНО: на auth у тебя фон чёрный, поэтому шапка видна; margin у header-text рассчитан на fixed-хедер. Оставляем fixed. */
+/* Фикс: контейнер внутри хедера НЕ должен наследовать min-height и flex */
+.header .container,
+.header-inner {
+  min-height: 0 !important;    /* сбиваем 100vh */
+  height: 80px;                 /* высота хедера на десктопе */
+  display: grid !important;     /* наш грид для хедера */
+  align-items: center;
+  justify-content: normal;
+  padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  .header .container,
+  .header-inner {
+    height: 60px;               /* высота на мобилке */
+    padding: 0 12px;
+  }
+}

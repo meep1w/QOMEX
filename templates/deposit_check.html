@@ -15,71 +15,61 @@
   <canvas id="stars"></canvas>
 
   <!-- HEADER -->
-  <header class="header">
-    <div class="header-container header-inner">
+ <header class="header">
+  <div class="container header-inner">
 
-      <!-- Бургер (мобилка) -->
-      <button id="burger-button" class="burger" aria-label="Открыть меню" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+    <button id="burger" class="burger-btn" aria-label="Открыть меню" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
 
-      <!-- Логотип по центру -->
-      <a href="/" class="logo-link" aria-label="QOMEX Home">
-        <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
-      </a>
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="close-btn" id="closeMenu" aria-label="Закрыть">×</button>
 
-      <!-- Навигация (ПК) -->
-      <nav class="nav" role="navigation" aria-label="Главная навигация">
+      {% if request.cookies.get('user_email') %}
+      <a href="/profile" class="menu-cta" data-i18n="header_profile">Профиль</a>
+      {% else %}
+      <a href="/auth" class="menu-cta" data-i18n="header_register">Зарегистрироваться</a>
+      {% endif %}
+
+      <nav class="mobile-nav">
+        <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
         <a href="/#about" data-i18n="header_about">О софте</a>
         <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
-        <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
         <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
       </nav>
-
-      <!-- Правая часть: Профиль/Регистрация (ПК) + языки -->
-      <div class="header-right">
-        {% if request.cookies.get("user_email") %}
-        <a href="/profile" class="contact-btn desktop-only">
-          <span data-i18n="header_profile">Профиль</span>
-
-        </a>
-        {% else %}
-        <a href="/auth" class="contact-btn desktop-only">
-          <span data-i18n="header_register">Зарегистрироваться</span>
-
-        </a>
-        {% endif %}
-
-        <div class="language-icons">
-          <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
-          <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
-          <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
-        </div>
-      </div>
     </div>
 
-    <!-- Мобильное меню (с кнопкой Профиль/Регистрация) -->
-    <div class="mobile-overlay" id="mobile-overlay">
-      <div class="mobile-menu">
-        <nav class="mobile-nav" aria-label="Мобильное меню">
-          <a href="/#about" data-i18n="header_about">О софте</a>
-          <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
-          <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-          <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+    <a href="/" class="logo-link">
+      <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+    </a>
 
-          {% if request.cookies.get("user_email") %}
-            <a href="/profile">
-              <span data-i18n="header_profile">Профиль</span>
-            </a>
-          {% else %}
-            <a href="/auth">
-              <span data-i18n="header_register">Зарегистрироваться</span>
-            </a>
-          {% endif %}
-        </nav>
-      </div>
+    <nav class="nav">
+      <a href="/#about" data-i18n="header_about">О софте</a>
+      <a href="/#advantages" data-i18n="header_risks">Виды риска</a>
+      <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+      <a href="/#instruction" data-i18n="header_instruction">Инструкция</a>
+    </nav>
+
+    <div class="header-right">
+      {% if request.cookies.get("user_email") %}
+      <a href="/profile" class="contact-btn">
+        <span data-i18n="header_profile">Профиль</span>
+      </a>
+      {% else %}
+      <a href="/auth" class="contact-btn">
+        <span data-i18n="header_register">Зарегистрироваться</span>
+      </a>
+      {% endif %}
     </div>
-  </header>
+
+    <div class="language-icons">
+      <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+      <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+      <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
+    </div>
+  </div>
+</header>
+
 
   <!-- CONTENT -->
   <main class="container">
@@ -231,5 +221,52 @@
       });
     });
   </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const burger = document.getElementById('burger');
+    const menu   = document.getElementById('mobileMenu');
+    const close  = document.getElementById('closeMenu');
+
+    // создаём/используем backdrop
+    let backdrop = document.querySelector('.menu-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.className = 'menu-backdrop';
+      document.body.appendChild(backdrop);
+    }
+
+    // если меню вдруг оказалось внутри header — вынесем в body
+    if (menu && menu.parentElement !== document.body) {
+      document.body.appendChild(menu);
+    }
+
+    const openMenu  = () => {
+      menu.classList.add('show');
+      backdrop.classList.add('show');
+      burger?.classList.add('active');
+      burger?.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    };
+    const closeMenu = () => {
+      menu.classList.remove('show');
+      backdrop.classList.remove('show');
+      burger?.classList.remove('active');
+      burger?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    };
+
+    burger?.addEventListener('click', () => {
+      const opened = menu.classList.contains('show');
+      opened ? closeMenu() : openMenu();
+    });
+    close?.addEventListener('click', closeMenu);
+    backdrop.addEventListener('click', closeMenu);
+    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+  });
+</script>
+
+
 </body>
 </html>
