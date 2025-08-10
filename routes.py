@@ -81,9 +81,8 @@ Sitemap: {BASE_URL}/sitemap.xml
 @router.get("/sitemap.xml")
 def sitemap():
     urls = [
-        "/", "/auth", "/go-to-signals",
+        "/", "/auth", "/signals",
         "/privacy.html", "/terms.html", "/cookie.html",
-        # сюда можно добавить: "/signals", когда сделаем SEO-страницу
     ]
 
     urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
@@ -94,3 +93,14 @@ def sitemap():
 
     xml = '<?xml version="1.0" encoding="UTF-8"?>' + tostring(urlset, encoding="unicode")
     return Response(content=xml, media_type="application/xml")
+
+from fastapi.responses import HTMLResponse, RedirectResponse
+
+@router.get("/signals", response_class=HTMLResponse)
+def signals_page(request: Request):
+    return templates.TemplateResponse("signals.html", {"request": request})
+
+# Постоянный редирект со старого пути (если он где-то используется)
+@router.get("/go-to-signals")
+def go_to_signals():
+    return RedirectResponse("/signals", status_code=301)
