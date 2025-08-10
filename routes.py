@@ -70,7 +70,7 @@ from fastapi.responses import (
     PlainTextResponse,
     HTMLResponse,
     RedirectResponse,
-    Response,
+
 )
 from xml.etree.ElementTree import Element, SubElement, tostring
 
@@ -88,6 +88,18 @@ Sitemap: {BASE_URL}/sitemap.xml
         media_type="text/plain; charset=utf-8",
         headers={"Cache-Control": "no-store"},
     )
+
+from fastapi.responses import Response
+
+@router.head("/robots.txt")
+def robots_head():
+    # HEAD для robots.txt: отдать только заголовки, без тела
+    return Response(
+        status_code=200,
+        media_type="text/plain; charset=utf-8",
+        headers={"Cache-Control": "no-store"},
+    )
+
 
 # ---------- sitemap.xml ----------
 @router.get("/sitemap.xml")
