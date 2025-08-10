@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
             country_city: "Страна, город (необязательно)",
             save_btn: "Сохранить изменения",
             reset_text: "Чтобы изменить пароль, отправьте запрос на ваш email.Вы получите ссылку для сброса пароля.",
-            send_link: "Отправить ссылку",
+            send_link: "Изменить пароль",
             referral_soon: "Скоро"
         },
         en: {
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
             country_city: "Country, City (optional)",
             save_btn: "Save data",
             reset_text: "To change your password, send a request to your email.You will receive a reset link.",
-            send_link: "Send link",
+            send_link: "Change password",
             referral_soon: "Coming soon"
         },
         ua: {
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
             country_city: "Країна, місто (необов'язково)",
             save_btn: "Зберегти дані",
             reset_text: "Щоб змінити пароль, надішліть запит на вашу пошту.Ви отримаєте посилання для скидання.",
-            send_link: "Надіслати посилання",
+            send_link: "Поміняти пароль",
             referral_soon: "Скоро"
         }
     };
