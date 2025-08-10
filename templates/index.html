@@ -13,321 +13,333 @@
     <!-- Фоновая сетка -->
     <div class="background-image"></div>
 
-<header class="header">
-  <div class="container header-inner">
+    <header class="header">
+        <div class="container header-inner">
 
-<div class="burger-icon" id="burger">
- <img src="/static/img/HamburgerMd.svg" alt="Menu" class="burger-icon" />
-</div>
-
-<div class="mobile-menu" id="mobileMenu">
-  <div class="close-btn" id="closeMenu">×</div>
-  <a href="#about">О софте</a>
-  <a href="#advantages">Виды риска</a>
-  <a href="/go-to-signals">Сигналы</a>
-  <a href="#instruction">Инструкция</a>
-  <a href="/profile">Профиль</a>
-</div>
+            <button id="burger" class="burger-btn" aria-label="Открыть меню" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
 
 
-    <a href="/" class="logo-link">
-      <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
-    </a>
+            <div class="mobile-menu" id="mobileMenu">
+                <div class="close-btn" id="closeMenu">×</div>
+                {% if request.cookies.get("user_email") %}
+                <a href="/profile" class="contact-btn">
+                    <span data-i18n="header_profile">Профиль</span>
 
-    <nav class="nav">
-      <a href="#about" data-i18n="header_about">О софте</a>
-      <a href="#advantages" data-i18n="header_risks">Виды риска</a>
-      <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
-      <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
-    </nav>
+                </a>
+                {% else %}
+                <a href="/auth" class="contact-btn">
+                    <span data-i18n="header_register">Зарегистрироваться</span>
 
-    <div class="header-right">
-      {% if request.cookies.get("user_email") %}
-      <a href="/profile" class="contact-btn">
-        <span data-i18n="header_profile">Профиль</span>
+                </a>
+                {% endif %}
+                <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+                <a href="#about" data-i18n="header_about">О софте</a>
+                <a href="#advantages" data-i18n="header_risks">Виды риска</a>
+                <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
 
-      </a>
-      {% else %}
-      <a href="/auth" class="contact-btn">
-        <span data-i18n="header_register">Зарегистрироваться</span>
-
-      </a>
-      {% endif %}
-    </div>
-
-    <div class="language-icons">
-      <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
-      <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
-      <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
-    </div>
-
-  </div>
-</header>
+            </div>
 
 
+            <a href="/" class="logo-link">
+                <img src="static/img/QomexLogo%202.svg" alt="QOMEX Logo" class="logo" />
+            </a>
+
+            <nav class="nav">
+                <a href="#about" data-i18n="header_about">О софте</a>
+                <a href="#advantages" data-i18n="header_risks">Виды риска</a>
+                <a href="/go-to-signals" data-i18n="header_signals">Сигналы</a>
+                <a href="#instruction" data-i18n="header_instruction">Инструкция</a>
+            </nav>
+
+            <div class="header-right">
+                {% if request.cookies.get("user_email") %}
+                <a href="/profile" class="contact-btn">
+                    <span data-i18n="header_profile">Профиль</span>
+
+                </a>
+                {% else %}
+                <a href="/auth" class="contact-btn">
+                    <span data-i18n="header_register">Зарегистрироваться</span>
+
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="language-icons">
+                <img src="/static/img/ru.svg" alt="RU" class="lang-icon" data-lang="ru">
+                <img src="/static/img/en.svg" alt="EN" class="lang-icon" data-lang="en">
+                <img src="/static/img/ua.svg" alt="UA" class="lang-icon" data-lang="ua">
+            </div>
+
+        </div>
+    </header>
 
 
-<!-- Контент -->
-<section class="hero">
-  <div class="container">
-    <h1 data-i18n="hero_title">
-      Софт для <span>алгоритмической торговли</span> на PocketOption
-    </h1>
-    <p data-i18n="hero_subtitle">
-      Получайте сигналы на основе математических моделей и повышайте свой винрейт.
-    </p>
 
-    <div class="hero-bottom">
-      <a href="/go-to-signals" class="start-btn signal-btn">
-  <span data-i18n="hero_signals_btn">Сигналы</span>
-  <span class="icon-circle">
+
+    <!-- Контент -->
+    <section class="hero">
+        <div class="container">
+            <h1 data-i18n="hero_title">
+                Софт для <span>алгоритмической торговли</span> на PocketOption
+            </h1>
+            <p data-i18n="hero_subtitle">
+                Получайте сигналы на основе математических моделей и повышайте свой винрейт.
+            </p>
+
+            <div class="hero-bottom">
+                <a href="/go-to-signals" class="start-btn signal-btn">
+                    <span data-i18n="hero_signals_btn">Сигналы</span>
+                    <span class="icon-circle">
     <img src="static/img/Vector.svg" alt="Arrow" />
   </span>
-</a>
+                </a>
 
 
-      <img src="static/img/150.svg" data-i18n-alt="hero_img_alt" alt="Доходность 150%" class="hero-img" />
-    </div>
+                <img src="static/img/150.svg" data-i18n-alt="hero_img_alt" alt="Доходность 150%" class="hero-img" />
+            </div>
 
-    <!-- ✅ Рука тоже должна быть ВНУТРИ .container -->
-    <div class="hand-bg">
-      <img src="static/img/hand.png" data-i18n-alt="hero_hand_alt" alt="Рука с телефоном" class="hand-image" />
-    </div>
-  </div>
-</section>
+            <!-- ✅ Рука тоже должна быть ВНУТРИ .container -->
+            <div class="hand-bg">
+                <img src="static/img/hand.png" data-i18n-alt="hero_hand_alt" alt="Рука с телефоном" class="hand-image" />
+            </div>
+        </div>
+    </section>
 
 
 
- <!-- Огромный фоновый текст -->
-<div class="background-text" data-i18n="bg_text">QOMEX Trading</div>
+    <!-- Огромный фоновый текст -->
+    <div class="background-text" data-i18n="bg_text">QOMEX Trading</div>
 </div>
 
 <section class="advantages" id="advantages">
-  <div class="container">
-    <h2 data-i18n="advantages_title">Преимущества<br>торговли с софтом</h2>
+    <div class="container">
+        <h2 data-i18n="advantages_title">Преимущества<br>торговли с софтом</h2>
 
-<div class="table-wrapper">
-    <div class="advantage-table">
-      <div class="row row-head">
-        <div class="cell cell-left"></div>
-        <div class="cell" data-i18n="col_software">Трейдинг с помощью софта</div>
-        <div class="cell" data-i18n="col_manual">Ручная торговля</div>
-      </div>
+        <div class="table-wrapper">
+            <div class="advantage-table">
+                <div class="row row-head">
+                    <div class="cell cell-left"></div>
+                    <div class="cell" data-i18n="col_software">Трейдинг с помощью софта</div>
+                    <div class="cell" data-i18n="col_manual">Ручная торговля</div>
+                </div>
 
-      <div class="row">
-        <div class="cell cell-left" data-i18n="row_speed">Скорость исполнения и эффективность</div>
-        <div class="cell">
-          <div class="icon-tooltip">
-            <img src="static/img/check.svg" alt="✓" />
-            <div class="tooltip" data-i18n="tooltip_speed">Автоматическое исполнение сделок без задержек</div>
-          </div>
+                <div class="row">
+                    <div class="cell cell-left" data-i18n="row_speed">Скорость исполнения и эффективность</div>
+                    <div class="cell">
+                        <div class="icon-tooltip">
+                            <img src="static/img/check.svg" alt="✓" />
+                            <div class="tooltip" data-i18n="tooltip_speed">Автоматическое исполнение сделок без задержек</div>
+                        </div>
+                    </div>
+                    <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
+                </div>
+
+                <div class="row">
+                    <div class="cell cell-left" data-i18n="row_emotions">Исключение эмоционального фактора</div>
+                    <div class="cell">
+                        <div class="icon-tooltip">
+                            <img src="static/img/check.svg" alt="✓" />
+                            <div class="tooltip" data-i18n="tooltip_emotions">Система торгует по алгоритму, без эмоций и импульсов</div>
+                        </div>
+                    </div>
+                    <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
+                </div>
+
+                <div class="row">
+                    <div class="cell cell-left" data-i18n="row_discipline">Последовательность и дисциплина</div>
+                    <div class="cell">
+                        <div class="icon-tooltip">
+                            <img src="static/img/check.svg" alt="✓" />
+                            <div class="tooltip" data-i18n="tooltip_discipline">Алгоритм строго соблюдает торговую стратегию</div>
+                        </div>
+                    </div>
+                    <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
+                </div>
+
+                <div class="row">
+                    <div class="cell cell-left" data-i18n="row_data">Обработка большого объема рынков и данных</div>
+                    <div class="cell">
+                        <div class="icon-tooltip">
+                            <img src="static/img/check.svg" alt="✓" />
+                            <div class="tooltip" data-i18n="tooltip_data">Система анализирует десятки сигналов за секунды</div>
+                        </div>
+                    </div>
+                    <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
+                </div>
+
+                <div class="row">
+                    <div class="cell cell-left" data-i18n="row_income">Прогнозируемый доход</div>
+                    <div class="cell">
+                        <div class="icon-tooltip">
+                            <img src="static/img/check.svg" alt="✓" />
+                            <div class="tooltip" data-i18n="tooltip_income">Результаты зависят от стабильных алгоритмов</div>
+                        </div>
+                    </div>
+                    <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
+                </div>
+
+                <div class="row">
+                    <div class="cell cell-left" data-i18n="row_errors">Снижение транзакционных и операционных ошибок</div>
+                    <div class="cell">
+                        <div class="icon-tooltip">
+                            <img src="static/img/check.svg" alt="✓" />
+                            <div class="tooltip" data-i18n="tooltip_errors">Минимизируются ошибки при входе и выходе из сделки</div>
+                        </div>
+                    </div>
+                    <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
+                </div>
+            </div>
         </div>
-        <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
-      </div>
 
-      <div class="row">
-        <div class="cell cell-left" data-i18n="row_emotions">Исключение эмоционального фактора</div>
-        <div class="cell">
-          <div class="icon-tooltip">
-            <img src="static/img/check.svg" alt="✓" />
-            <div class="tooltip" data-i18n="tooltip_emotions">Система торгует по алгоритму, без эмоций и импульсов</div>
-          </div>
-        </div>
-        <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
-      </div>
-
-      <div class="row">
-        <div class="cell cell-left" data-i18n="row_discipline">Последовательность и дисциплина</div>
-        <div class="cell">
-          <div class="icon-tooltip">
-            <img src="static/img/check.svg" alt="✓" />
-            <div class="tooltip" data-i18n="tooltip_discipline">Алгоритм строго соблюдает торговую стратегию</div>
-          </div>
-        </div>
-        <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
-      </div>
-
-      <div class="row">
-        <div class="cell cell-left" data-i18n="row_data">Обработка большого объема рынков и данных</div>
-        <div class="cell">
-          <div class="icon-tooltip">
-            <img src="static/img/check.svg" alt="✓" />
-            <div class="tooltip" data-i18n="tooltip_data">Система анализирует десятки сигналов за секунды</div>
-          </div>
-        </div>
-        <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
-      </div>
-
-      <div class="row">
-        <div class="cell cell-left" data-i18n="row_income">Прогнозируемый доход</div>
-        <div class="cell">
-          <div class="icon-tooltip">
-            <img src="static/img/check.svg" alt="✓" />
-            <div class="tooltip" data-i18n="tooltip_income">Результаты зависят от стабильных алгоритмов</div>
-          </div>
-        </div>
-        <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
-      </div>
-
-      <div class="row">
-        <div class="cell cell-left" data-i18n="row_errors">Снижение транзакционных и операционных ошибок</div>
-        <div class="cell">
-          <div class="icon-tooltip">
-            <img src="static/img/check.svg" alt="✓" />
-            <div class="tooltip" data-i18n="tooltip_errors">Минимизируются ошибки при входе и выходе из сделки</div>
-          </div>
-        </div>
-        <div class="cell"><img src="static/img/cross.svg" alt="✗" /></div>
-      </div>
     </div>
-  </div>
-
-  </div>
 </section>
 
 
 
 
 <section class="about-section" id="about">
-  <div class="about-header">
-    <div class="about-label" data-i18n="about_label">О софте</div>
-    <h2 class="about-title" data-i18n="about_title">
-      Софт подходит для новичков<br>
-      в мире трейдинга и криптовалюты
-    </h2>
-  </div>
-
-  <!-- ====== ВЕРСИЯ ДЛЯ ПК ====== -->
-  <div class="card-layout desktop-only">
-    <div class="card-row">
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about1.png" alt="Картинка 1">
-        </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card1_title">Доходность 5% – 30% в месяц</h3>
-          <p data-i18n="about_card1_text">
-            Доходность от 5% до 30% в зависимости от ваших рисков и волатильности. Мы предоставляем рекомендации по разумному риску.
-          </p>
-        </div>
-      </div>
-
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about2.png" alt="Картинка 2">
-        </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card2_title">Торговля на вашем аккаунте</h3>
-          <p data-i18n="about_card2_text">
-            Вы получаете ПО и инструкции, подключаете счёт и выбираете настройки. Всё просто и безопасно.
-          </p>
-        </div>
-      </div>
+    <div class="about-header">
+        <div class="about-label" data-i18n="about_label">О софте</div>
+        <h2 class="about-title" data-i18n="about_title">
+            Софт подходит для новичков<br>
+            в мире трейдинга и криптовалюты
+        </h2>
     </div>
 
-    <div class="card-row">
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about3.png" alt="Картинка 3">
-        </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card3_title">Функция вывода из просадки</h3>
-          <p data-i18n="about_card3_text">
-            Вы можете подключить монету, которая у вас в просадке, и бот выведет её за короткий промежуток времени с помощью высокочастотного трейдинга.
-          </p>
-        </div>
-      </div>
+    <!-- ====== ВЕРСИЯ ДЛЯ ПК ====== -->
+    <div class="card-layout desktop-only">
+        <div class="card-row">
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about1.png" alt="Картинка 1">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card1_title">Доходность 5% – 30% в месяц</h3>
+                    <p data-i18n="about_card1_text">
+                        Доходность от 5% до 30% в зависимости от ваших рисков и волатильности. Мы предоставляем рекомендации по разумному риску.
+                    </p>
+                </div>
+            </div>
 
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about4.png" alt="Картинка 4">
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about2.png" alt="Картинка 2">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card2_title">Торговля на вашем аккаунте</h3>
+                    <p data-i18n="about_card2_text">
+                        Вы получаете ПО и инструкции, подключаете счёт и выбираете настройки. Всё просто и безопасно.
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card4_title">Понятный функционал без ошибок</h3>
-          <p data-i18n="about_card4_text">
-            Мы сделали максимально понятный интерфейс и функционал. Для вашего удобства добавлена подробная инструкция по использованию робота.
-          </p>
-        </div>
-      </div>
 
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about5.png" alt="Картинка 5">
+        <div class="card-row">
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about3.png" alt="Картинка 3">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card3_title">Функция вывода из просадки</h3>
+                    <p data-i18n="about_card3_text">
+                        Вы можете подключить монету, которая у вас в просадке, и бот выведет её за короткий промежуток времени с помощью высокочастотного трейдинга.
+                    </p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about4.png" alt="Картинка 4">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card4_title">Понятный функционал без ошибок</h3>
+                    <p data-i18n="about_card4_text">
+                        Мы сделали максимально понятный интерфейс и функционал. Для вашего удобства добавлена подробная инструкция по использованию робота.
+                    </p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about5.png" alt="Картинка 5">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card5_title">Сообщество единомышленников</h3>
+                    <p data-i18n="about_card5_text">
+                        Вы попадаете в чат с обсуждением стратегии и поддержкой. Также мы даём сигналы для получения максимальной прибыли ботом.
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card5_title">Сообщество единомышленников</h3>
-          <p data-i18n="about_card5_text">
-            Вы попадаете в чат с обсуждением стратегии и поддержкой. Также мы даём сигналы для получения максимальной прибыли ботом.
-          </p>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- ====== ВЕРСИЯ ДЛЯ МОБИЛЬНЫХ (слайдер) ====== -->
-  <div class="card-slider mobile-only">
-    <div class="slider-track">
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about1.png" alt="Картинка 1">
-        </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card1_title">Доходность 5% – 30% в месяц</h3>
-          <p data-i18n="about_card1_text">
-            Доходность от 5% до 30% в зависимости от ваших рисков и волатильности. Мы предоставляем рекомендации по разумному риску.
-          </p>
-        </div>
-      </div>
+    <!-- ====== ВЕРСИЯ ДЛЯ МОБИЛЬНЫХ (слайдер) ====== -->
+    <div class="card-slider mobile-only">
+        <div class="slider-track">
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about1.png" alt="Картинка 1">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card1_title">Доходность 5% – 30% в месяц</h3>
+                    <p data-i18n="about_card1_text">
+                        Доходность от 5% до 30% в зависимости от ваших рисков и волатильности. Мы предоставляем рекомендации по разумному риску.
+                    </p>
+                </div>
+            </div>
 
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about2.png" alt="Картинка 2">
-        </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card2_title">Торговля на вашем аккаунте</h3>
-          <p data-i18n="about_card2_text">
-            Вы получаете ПО и инструкции, подключаете счёт и выбираете настройки. Всё просто и безопасно.
-          </p>
-        </div>
-      </div>
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about2.png" alt="Картинка 2">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card2_title">Торговля на вашем аккаунте</h3>
+                    <p data-i18n="about_card2_text">
+                        Вы получаете ПО и инструкции, подключаете счёт и выбираете настройки. Всё просто и безопасно.
+                    </p>
+                </div>
+            </div>
 
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about3.png" alt="Картинка 3">
-        </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card3_title">Функция вывода из просадки</h3>
-          <p data-i18n="about_card3_text">
-            Вы можете подключить монету, которая у вас в просадке, и бот выведет её за короткий промежуток времени с помощью высокочастотного трейдинга.
-          </p>
-        </div>
-      </div>
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about3.png" alt="Картинка 3">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card3_title">Функция вывода из просадки</h3>
+                    <p data-i18n="about_card3_text">
+                        Вы можете подключить монету, которая у вас в просадке, и бот выведет её за короткий промежуток времени с помощью высокочастотного трейдинга.
+                    </p>
+                </div>
+            </div>
 
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about4.png" alt="Картинка 4">
-        </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card4_title">Понятный функционал без ошибок</h3>
-          <p data-i18n="about_card4_text">
-            Мы сделали максимально понятный интерфейс и функционал. Для вашего удобства добавлена подробная инструкция по использованию робота.
-          </p>
-        </div>
-      </div>
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about4.png" alt="Картинка 4">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card4_title">Понятный функционал без ошибок</h3>
+                    <p data-i18n="about_card4_text">
+                        Мы сделали максимально понятный интерфейс и функционал. Для вашего удобства добавлена подробная инструкция по использованию робота.
+                    </p>
+                </div>
+            </div>
 
-      <div class="info-card">
-        <div class="card-image">
-          <img src="static/img/about5.png" alt="Картинка 5">
+            <div class="info-card">
+                <div class="card-image">
+                    <img src="static/img/about5.png" alt="Картинка 5">
+                </div>
+                <div class="card-content">
+                    <h3 data-i18n="about_card5_title">Сообщество единомышленников</h3>
+                    <p data-i18n="about_card5_text">
+                        Вы попадаете в чат с обсуждением стратегии и поддержкой. Также мы даём сигналы для получения максимальной прибыли ботом.
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="card-content">
-          <h3 data-i18n="about_card5_title">Сообщество единомышленников</h3>
-          <p data-i18n="about_card5_text">
-            Вы попадаете в чат с обсуждением стратегии и поддержкой. Также мы даём сигналы для получения максимальной прибыли ботом.
-          </p>
-        </div>
-      </div>
     </div>
-  </div>
 </section>
 
 
@@ -335,134 +347,134 @@
 
 
 <section class="signals-section">
-  <a href="/go-to-signals" class="start-btn signal-btn">
-  <span data-i18n="hero_signals_btn">Сигналы</span>
-  <span class="icon-circle">
+    <a href="/go-to-signals" class="start-btn signal-btn">
+        <span data-i18n="hero_signals_btn">Сигналы</span>
+        <span class="icon-circle">
     <img src="static/img/Vector.svg" alt="Arrow" />
   </span>
-</a>
+    </a>
 
 </section>
 
 <section class="video-section" id="instruction">
-  <div class="video-content">
-    <div class="video-text">
-      <h2 data-i18n="video_title">
-        Посмотрите<br>короткое видео<br>и узнайте больше
-      </h2>
+    <div class="video-content">
+        <div class="video-text">
+            <h2 data-i18n="video_title">
+                Посмотрите<br>короткое видео<br>и узнайте больше
+            </h2>
+        </div>
+        <div class="video-frame">
+            <iframe
+                    width="560"
+                    height="315"
+                    src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+                    title="YouTube video"
+                    frameborder="0"
+                    allowfullscreen
+            ></iframe>
+        </div>
     </div>
-    <div class="video-frame">
-      <iframe
-        width="560"
-        height="315"
-        src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
-        title="YouTube video"
-        frameborder="0"
-        allowfullscreen
-      ></iframe>
-    </div>
-  </div>
 </section>
 
 <section class="feature-section">
-  <div class="feature-container">
-    <div class="feature-label" data-i18n="feature_label">Главная фишка</div>
-    <h2 class="feature-title" data-i18n="feature_title">
-      Софт анализирует рынок<br>
-      из-за этого его сигналы точны на 99.97%
-    </h2>
-    <p class="feature-description" data-i18n="feature_desc">
-      Эту технологию мы разработали сами и применяем в торговле.<br>
-      За счёт этого софт становиться популянее с каждым днем.
-    </p>
-  </div>
+    <div class="feature-container">
+        <div class="feature-label" data-i18n="feature_label">Главная фишка</div>
+        <h2 class="feature-title" data-i18n="feature_title">
+            Софт анализирует рынок<br>
+            из-за этого его сигналы точны на 99.97%
+        </h2>
+        <p class="feature-description" data-i18n="feature_desc">
+            Эту технологию мы разработали сами и применяем в торговле.<br>
+            За счёт этого софт становиться популянее с каждым днем.
+        </p>
+    </div>
 </section>
 
 
 <div class="section-divider"></div>
 
 <section class="example-section">
-  <div class="example-header">
-    <div class="example-label" data-i18n="example_label">Пример</div>
-  </div>
-
-  <div class="example-block">
-    <div class="example-text">
-      <h2 data-i18n="example1_title">Софт постоянно оценивает<br>резкое падения цены</h2>
-      <p data-i18n="example1_text">
-        Монета BNB упала на 70%, бот усреднил цену и вышел на первом отскоке.<br>
-        Покупки всегда совершаются на локальных минимумах,<br>
-        за счёт чего мы получаем выгодную среднюю цену входа.
-      </p>
+    <div class="example-header">
+        <div class="example-label" data-i18n="example_label">Пример</div>
     </div>
 
-    <div class="example-number">01</div>
+    <div class="example-block">
+        <div class="example-text">
+            <h2 data-i18n="example1_title">Софт постоянно оценивает<br>резкое падения цены</h2>
+            <p data-i18n="example1_text">
+                Монета BNB упала на 70%, бот усреднил цену и вышел на первом отскоке.<br>
+                Покупки всегда совершаются на локальных минимумах,<br>
+                за счёт чего мы получаем выгодную среднюю цену входа.
+            </p>
+        </div>
 
-    <div class="example-image">
-      <img src="/static/img/1pic.png" data-i18n-alt="example_img1_alt" alt="График падения и отскока">
-    </div>
-  </div>
+        <div class="example-number">01</div>
 
-  <div class="example-block reverse">
-    <div class="example-number">02</div>
-
-    <div class="example-image">
-      <img src="/static/img/2pic.png" data-i18n-alt="example_img2_alt" alt="Алгоритм без эмоций">
-    </div>
-
-    <div class="example-text">
-      <h2 data-i18n="example2_title">Софт защищает от<br>эмоциональных решений</h2>
-      <p data-i18n="example2_text">
-        Когда рынок резко падает или растёт, многие начинают паниковать<br>
-        и совершают сделки на эмоциях. Алгоритм действует строго по расчёту —<br>
-        он не реагирует на шум, а ждёт подтверждённые точки входа.<br>
-        Это позволяет исключить человеческий фактор и увеличить точность сделок.
-      </p>
-    </div>
-  </div>
-
-  <div class="example-block">
-    <div class="example-text">
-      <h2 data-i18n="example3_title">Софт учитывает десятки<br>факторов за доли секунды</h2>
-      <p data-i18n="example3_text">
-        Пока трейдер анализирует график вручную, софт уже обработал<br>данные по объёмам, волатильности, уровню поддержки и сопротивления.<br> Благодаря этому он мгновенно находит оптимальную точку входа с минимальным риском. <br>Это недоступно при ручной торговле.
-      </p>
+        <div class="example-image">
+            <img src="/static/img/1pic.png" data-i18n-alt="example_img1_alt" alt="График падения и отскока">
+        </div>
     </div>
 
-    <div class="example-number">03</div>
+    <div class="example-block reverse">
+        <div class="example-number">02</div>
 
-    <div class="example-image">
-      <img src="/static/img/1pic.png" data-i18n-alt="example_img1_alt" alt="График падения и отскока">
+        <div class="example-image">
+            <img src="/static/img/2pic.png" data-i18n-alt="example_img2_alt" alt="Алгоритм без эмоций">
+        </div>
+
+        <div class="example-text">
+            <h2 data-i18n="example2_title">Софт защищает от<br>эмоциональных решений</h2>
+            <p data-i18n="example2_text">
+                Когда рынок резко падает или растёт, многие начинают паниковать<br>
+                и совершают сделки на эмоциях. Алгоритм действует строго по расчёту —<br>
+                он не реагирует на шум, а ждёт подтверждённые точки входа.<br>
+                Это позволяет исключить человеческий фактор и увеличить точность сделок.
+            </p>
+        </div>
     </div>
-  </div>
+
+    <div class="example-block">
+        <div class="example-text">
+            <h2 data-i18n="example3_title">Софт учитывает десятки<br>факторов за доли секунды</h2>
+            <p data-i18n="example3_text">
+                Пока трейдер анализирует график вручную, софт уже обработал<br>данные по объёмам, волатильности, уровню поддержки и сопротивления.<br> Благодаря этому он мгновенно находит оптимальную точку входа с минимальным риском. <br>Это недоступно при ручной торговле.
+            </p>
+        </div>
+
+        <div class="example-number">03</div>
+
+        <div class="example-image">
+            <img src="/static/img/1pic.png" data-i18n-alt="example_img1_alt" alt="График падения и отскока">
+        </div>
+    </div>
 </section>
 
 
 
 <footer class="site-footer">
-  <div class="footer-left">
-    <img src="/static/img/QomexLogo%202.svg" data-i18n-alt="footer_logo_alt" alt="Логотип" class="footer-logo" />
-  </div>
-
-  <div class="footer-center">
-    <nav class="footer-nav">
-      <a href="/cookie.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_cookies">Политика файлов куки</a>
-      <a href="/terms.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_terms">Условия использования</a>
-      <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Политика конфиденциальности</a>
-    </nav>
-
-    <div class="footer-copy" data-i18n="footer_copy">
-      © 2025 QOMEXTrading. Все права защищены.
+    <div class="footer-left">
+        <img src="/static/img/QomexLogo%202.svg" data-i18n-alt="footer_logo_alt" alt="Логотип" class="footer-logo" />
     </div>
-  </div>
 
-  <div class="footer-right">
-    <div class="footer-icons">
-      <a href="#"><img src="/static/img/TgFooter.svg" alt="TG" /></a>
-      <a href="#"><img src="/static/img/Youtube.svg" alt="YT" /></a>
+    <div class="footer-center">
+        <nav class="footer-nav">
+            <a href="/cookie.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_cookies">Политика файлов куки</a>
+            <a href="/terms.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_terms">Условия использования</a>
+            <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Политика конфиденциальности</a>
+        </nav>
+
+        <div class="footer-copy" data-i18n="footer_copy">
+            © 2025 QOMEXTrading. Все права защищены.
+        </div>
     </div>
-    <div class="footer-email" data-i18n="footer_support">Support: qomexsupport@gmail.com</div>
-  </div>
+
+    <div class="footer-right">
+        <div class="footer-icons">
+            <a href="#"><img src="/static/img/TgFooter.svg" alt="TG" /></a>
+            <a href="#"><img src="/static/img/Youtube.svg" alt="YT" /></a>
+        </div>
+        <div class="footer-email" data-i18n="footer_support">Support: qomexsupport@gmail.com</div>
+    </div>
 </footer>
 
 
@@ -483,307 +495,337 @@
 
 
 <script>
-const translations = {
-  ru: {
-    header_about: "О софте",
-    header_risks: "Виды риска",
-    header_signals: "Сигналы",
-    header_instruction: "Инструкция",
-    header_profile: "Профиль",
-    header_register: "Зарегистрироваться",
-    hero_title: "Софт для <span>алгоритмической торговли</span> на PocketOption",
-    hero_subtitle: "Получайте сигналы на основе математических моделей и повышайте свой винрейт.",
-    hero_signals_btn: "Сигналы",
-    hero_img_alt: "Доходность 150%",
-    hero_hand_alt: "Рука с телефоном",
-    bg_text: "QOMEX Trading",
-    advantages_title: "Преимущества<br>торговли с софтом",
-    col_software: "Трейдинг с помощью софта",
-    col_manual: "Ручная торговля",
-    row_speed: "Скорость исполнения и эффективность",
-    tooltip_speed: "Автоматическое исполнение сделок без задержек",
-    row_emotions: "Исключение эмоционального фактора",
-    tooltip_emotions: "Система торгует по алгоритму, без эмоций и импульсов",
-    row_discipline: "Последовательность и дисциплина",
-    tooltip_discipline: "Алгоритм строго соблюдает торговую стратегию",
-    row_data: "Обработка большого объема рынков и данных",
-    tooltip_data: "Система анализирует десятки сигналов за секунды",
-    row_income: "Прогнозируемый доход",
-    tooltip_income: "Результаты зависят от стабильных алгоритмов",
-    row_errors: "Снижение транзакционных и операционных ошибок",
-    tooltip_errors: "Минимизируются ошибки при входе и выходе из сделки",
-    about_label: "О софте",
-    about_title: "Софт подходит для новичков<br>в мире трейдинга и криптоволюты",
-    about_card1_title: "Доходность 5% – 30% в месяц",
-    about_card1_text: "Доходность от 5% до 30% в зависимости от ваших рисков и волатильности. Мы предоставляем рекомендации по разумному риску.",
-    about_card2_title: "Торговля на вашем аккаунте",
-    about_card2_text: "Вы получаете ПО и инструкции, подключаете счёт и выбираете настройки. Всё просто и безопасно.",
-    about_card3_title: "Автоматический подбор пар",
-    about_card3_text: "Вы получаете пару автоматически, которая просадке или наоборот растет, и софт выведет её за короткий промежуток времени с помощью высокочастотного трейдинга.",
-    about_card4_title: "Понятный функционал без ошибок",
-    about_card4_text: "Мы сделали максимально понятный интерфейс и функционал. Для вашего удобства добавлена подробная инструкция по использованию робота.",
-    about_card5_title: "Сообщество единомышленников",
-    about_card5_text: "Вы можете вступить в чат с обсуждением стратегии и поддержкой. Также мы даём сигналы для получения максимальной прибыли с нашим софтом.",
-    signals_btn: "Сигналы",
-    video_title: "Посмотрите<br>короткое видео<br>и узнайте больше",
-    feature_label: "Главная фишка",
-    feature_title: "Софт анализирует рынок<br>из-за этого его сигналы точны на 99.97%",
-    feature_desc: "Эту технологию мы разработали сами и применяем в торговле.<br>За счёт этого софт становиться популянее с каждым днем.",
-    example_label: "Пример",
-    example1_title: "Софт постоянно оценивает<br>лучшие валютные пары",
-    example1_text: "Монета BNB упала на 70%, софт провел анализ и выдал сигнал на покупку автоматически.<br>Покупки всегда совершаются на локальных минимумах,<br>за счёт чего мы получаем более верный сигнал.",
-    example2_title: "Софт защищает от<br>эмоциональных решений",
-    example2_text: "Когда рынок резко падает или растёт, многие начинают паниковать<br>и совершают сделки на эмоциях. Алгоритм действует строго по расчёту —<br>он не реагирует на шум, а ждёт подтверждённые точки входа.<br>Это позволяет исключить человеческий фактор и увеличить точность сделок.",
-    example3_title: "Софт учитывает десятки<br>факторов за доли секунды",
-    example3_text: "Пока трейдер анализирует график вручную, софт уже обработал<br>данные по объёмам, волатильности, уровню поддержки и сопротивления.<br> Благодаря этому он мгновенно находит оптимальную точку входа с минимальным риском. <br>Это недоступно при ручной торговле.",
-    example_img1_alt: "График падения и отскока",
-    example_img2_alt: "Алгоритм без эмоций",
-    footer_logo_alt: "Логотип",
-    footer_about: "О проекте",
-    footer_cookies: "Политика файлов куки",
-    footer_terms: "Условия использования",
-    footer_privacy: "Политика конфиденциальности",
-    footer_copy: "© 2025 QOMEXTrading. Все права защищены.",
-    footer_support: "Support: qomexsupport@gmail.com"
-  },
-  en: {
-    header_about: "About",
-    header_risks: "Risk Types",
-    header_signals: "Signals",
-    header_instruction: "Instruction",
-    header_profile: "Profile",
-    header_register: "Register",
-    hero_title: "Software for <span>algorithmic <br> trading</span> on PocketOption",
-    hero_subtitle: "Receive signals based on mathematical models and boost your winrate.",
-    hero_signals_btn: "Signals",
-    hero_img_alt: "Profitability 150%",
-    hero_hand_alt: "Hand with phone",
-    bg_text: "QOMEX Trading",
-    advantages_title: "Benefits<br>of trading with software",
-    col_software: "Trading with software",
-    col_manual: "Manual trading",
-    row_speed: "Execution speed and efficiency",
-    tooltip_speed: "Automatic trade execution without delays",
-    row_emotions: "Exclusion of emotional factors",
-    tooltip_emotions: "System trades by algorithm, without emotions and impulses",
-    row_discipline: "Consistency and discipline",
-    tooltip_discipline: "Algorithm strictly follows trading strategy",
-    row_data: "Processing large volume of markets and data",
-    tooltip_data: "System analyzes dozens of signals per second",
-    row_income: "Predictable income",
-    tooltip_income: "Results depend on stable algorithms",
-    row_errors: "Reduced transactional and operational errors",
-    tooltip_errors: "Minimizes entry and exit mistakes",
-    about_label: "About",
-    about_title: "The software is suitable for beginners<br>in trading and crypto",
-    about_card1_title: "Profitability 5% – 30% monthly",
-    about_card1_text: "Profit ranges from 5% to 30% depending on your risks and volatility. We provide recommendations for reasonable risk.",
-    about_card2_title: "Trading on your account",
-    about_card2_text: "You get software and instructions, connect your account and choose settings. Simple and secure.",
-    about_card3_title: "Automatic matching of pairs",
-    about_card3_text: "You get a pair automatically that is declining or growing, and the software will withdraw it in a short period of time using high-frequency trading.",
-    about_card4_title: "Clear functionality without errors",
-    about_card4_text: "We made the interface as clear as possible. Detailed user manual included.",
-    about_card5_title: "Community of like-minded people",
-    about_card5_text: "You can join the chat to discuss strategy and support. We also give signals to maximize profits with our software.",
-    signals_btn: "Signals",
-    video_title: "Watch<br>a short video<br>and learn more",
-    feature_label: "Main feature",
-    feature_title: "Software analyzes the market<br>so its signals are 99.97% accurate",
-    feature_desc: "We developed this tech ourselves and use it in trading.<br>That’s why the software is getting more popular daily.",
-    example_label: "Example",
-    example1_title: "Software constantly evaluates<br>sudden price drops",
-    example1_text: "The BNB coin dropped by 70%, the software performed an analysis and issued a buy signal automatically.<br>Purchases are always made at local lows,<br>due to which we get a more accurate signal.",
-    example2_title: "Software protects from<br>emotional decisions",
-    example2_text: "When market moves sharply, many panic<br>and make emotional trades. Algorithm acts only by calculation —<br>ignores noise and waits for confirmed entry points.<br>This excludes human factor and increases accuracy.",
-    example3_title: "Software considers dozens<br>of factors in split seconds",
-    example3_text: "While trader analyzes chart manually, software already processed<br>data on volume, volatility, support and resistance.<br>This gives instant optimal entry point with minimal risk.<br>Impossible in manual trading.",
-    example_img1_alt: "Drop and bounce chart",
-    example_img2_alt: "Emotionless algorithm",
-    footer_logo_alt: "Logo",
-    footer_about: "About project",
-    footer_cookies: "Cookie Policy",
-    footer_terms: "Terms of Use",
-    footer_privacy: "Privacy Policy",
-    footer_copy: "© 2025 QOMEXTrading. All rights reserved.",
-    footer_support: "Support: qomexsupport@gmail.com"
-  },
-  ua: {
-    header_about: "Про софт",
-    header_risks: "Види ризику",
-    header_signals: "Сигнали",
-    header_instruction: "Інструкція",
-    header_profile: "Профіль",
-    header_register: "Зареєструватися",
-    hero_title: "Софт для <span>алгоритмічної <br> торгівлі</span> на PocketOption",
-    hero_subtitle: "Отримуйте сигнали на основі математичних моделей та підвищуйте свій вінрейт.",
-    hero_signals_btn: "Сигнали",
-    hero_img_alt: "Прибутковість 150%",
-    hero_hand_alt: "Рука з телефоном",
-    bg_text: "QOMEX Trading",
-    advantages_title: "Переваги<br>торгівлі з софтом",
-    col_software: "Трейдинг за допомогою софту",
-    col_manual: "Ручна торгівля",
-    row_speed: "Швидкість виконання та ефективність",
-    tooltip_speed: "Автоматичне виконання угод без затримок",
-    row_emotions: "Виключення емоційного фактора",
-    tooltip_emotions: "Система торгує за алгоритмом, без емоцій та імпульсів",
-    row_discipline: "Послідовність та дисципліна",
-    tooltip_discipline: "Алгоритм суворо дотримується стратегії",
-    row_data: "Обробка великого обсягу ринків та даних",
-    tooltip_data: "Система аналізує десятки сигналів за секунди",
-    row_income: "Прогнозований дохід",
-    tooltip_income: "Результати залежать від стабільних алгоритмів",
-    row_errors: "Зменшення помилок при угодах",
-    tooltip_errors: "Мінімізуються помилки при вході та виході з угод",
-    about_label: "Про софт",
-    about_title: "Софт підходить для новачків<br>у трейдингу та крипті",
-    about_card1_title: "Прибутковість 5% – 30% на місяць",
-    about_card1_text: "Прибутковість від 5% до 30% залежно від ваших ризиків та волатильності. Ми надаємо поради щодо розумного ризику.",
-    about_card2_title: "Торгівля на вашому акаунті",
-    about_card2_text: "Ви отримуєте ПО та інструкції, підключаєте рахунок і вибираєте налаштування. Все просто і безпечно.",
-    about_card3_title: "Автоматичне зіставлення пар",
-    about_card3_text: "Ви автоматично отримуєте пару, яка знижується або зростає, і програмне забезпечення виводить її протягом короткого періоду часу, використовуючи високочастотну торгівлю.",
-    about_card4_title: "Зрозумілий функціонал без помилок",
-    about_card4_text: "Ми зробили інтерфейс максимально зрозумілим. Додано докладну інструкцію.",
-    about_card5_title: "Спільнота однодумців",
-    about_card5_text: "Ви можете приєднатися до чату, щоб обговорити стратегію та підтримку. Ми також надаємо сигнали для отримання максимального прибутку за допомогою нашого програмного забезпечення.",
-    signals_btn: "Сигнали",
-    video_title: "Подивіться<br>коротке відео<br>і дізнайтесь більше",
-    feature_label: "Головна фішка",
-    feature_title: "Софт аналізує ринок<br>і його сигнали точні на 99.97%",
-    feature_desc: "Цю технологію ми розробили самостійно та застосовуємо у торгівлі.<br>Завдяки цьому софт стає дедалі популярнішим.",
-    example_label: "Приклад",
-    example1_title: "Софт постійно оцінює<br>різке падіння ціни",
-    example1_text: "Монета BNB впала на 70%, софт провів аналіз і видав сигнал на покупку автоматично.<br>Покупки завжди відбуваються на локальних мінімумах, < br > за рахунок чого ми отримуємо більш вірний сигнал.",
-    example2_title: "Софт захищає від<br>емоційних рішень",
-    example2_text: "Коли ринок різко падає чи зростає, багато хто панікує<br>і здійснює угоди на емоціях. Алгоритм діє лише за розрахунком —<br>не реагує на шум, а чекає підтверджених точок входу.<br>Це дозволяє виключити людський фактор і підвищити точність.",
-    example3_title: "Софт враховує десятки<br>факторів за частки секунди",
-    example3_text: "Поки трейдер аналізує графік вручну, софт вже обробив<br>дані по обсягам, волатильності, підтримці та опору.<br>Завдяки цьому він миттєво знаходить оптимальну точку входу з мінімальним ризиком.<br>Це недоступно у ручній торгівлі.",
-    example_img1_alt: "Графік падіння і відскоку",
-    example_img2_alt: "Алгоритм без емоцій",
-    footer_logo_alt: "Логотип",
-    footer_about: "Про проєкт",
-    footer_cookies: "Політика куки",
-    footer_terms: "Умови використання",
-    footer_privacy: "Політика конфіденційності",
-    footer_copy: "© 2025 QOMEXTrading. Всі права захищені.",
-    footer_support: "Підтримка: qomexsupport@gmail.com"
-  }
-};
+    const translations = {
+        ru: {
+            header_about: "О софте",
+            header_risks: "Виды риска",
+            header_signals: "Сигналы",
+            header_instruction: "Инструкция",
+            header_profile: "Профиль",
+            header_register: "Зарегистрироваться",
+            hero_title: "Софт для <span>алгоритмической торговли</span> на PocketOption",
+            hero_subtitle: "Получайте сигналы на основе математических моделей и повышайте свой винрейт.",
+            hero_signals_btn: "Сигналы",
+            hero_img_alt: "Доходность 150%",
+            hero_hand_alt: "Рука с телефоном",
+            bg_text: "QOMEX Trading",
+            advantages_title: "Преимущества<br>торговли с софтом",
+            col_software: "Трейдинг с помощью софта",
+            col_manual: "Ручная торговля",
+            row_speed: "Скорость исполнения и эффективность",
+            tooltip_speed: "Автоматическое исполнение сделок без задержек",
+            row_emotions: "Исключение эмоционального фактора",
+            tooltip_emotions: "Система торгует по алгоритму, без эмоций и импульсов",
+            row_discipline: "Последовательность и дисциплина",
+            tooltip_discipline: "Алгоритм строго соблюдает торговую стратегию",
+            row_data: "Обработка большого объема рынков и данных",
+            tooltip_data: "Система анализирует десятки сигналов за секунды",
+            row_income: "Прогнозируемый доход",
+            tooltip_income: "Результаты зависят от стабильных алгоритмов",
+            row_errors: "Снижение транзакционных и операционных ошибок",
+            tooltip_errors: "Минимизируются ошибки при входе и выходе из сделки",
+            about_label: "О софте",
+            about_title: "Софт подходит для новичков<br>в мире трейдинга и криптоволюты",
+            about_card1_title: "Доходность 5% – 30% в месяц",
+            about_card1_text: "Доходность от 5% до 30% в зависимости от ваших рисков и волатильности. Мы предоставляем рекомендации по разумному риску.",
+            about_card2_title: "Торговля на вашем аккаунте",
+            about_card2_text: "Вы получаете ПО и инструкции, подключаете счёт и выбираете настройки. Всё просто и безопасно.",
+            about_card3_title: "Автоматический подбор пар",
+            about_card3_text: "Вы получаете пару автоматически, которая просадке или наоборот растет, и софт выведет её за короткий промежуток времени с помощью высокочастотного трейдинга.",
+            about_card4_title: "Понятный функционал без ошибок",
+            about_card4_text: "Мы сделали максимально понятный интерфейс и функционал. Для вашего удобства добавлена подробная инструкция по использованию робота.",
+            about_card5_title: "Сообщество единомышленников",
+            about_card5_text: "Вы можете вступить в чат с обсуждением стратегии и поддержкой. Также мы даём сигналы для получения максимальной прибыли с нашим софтом.",
+            signals_btn: "Сигналы",
+            video_title: "Посмотрите<br>короткое видео<br>и узнайте больше",
+            feature_label: "Главная фишка",
+            feature_title: "Софт анализирует рынок<br>из-за этого его сигналы точны на 99.97%",
+            feature_desc: "Эту технологию мы разработали сами и применяем в торговле.<br>За счёт этого софт становиться популянее с каждым днем.",
+            example_label: "Пример",
+            example1_title: "Софт постоянно оценивает<br>лучшие валютные пары",
+            example1_text: "Монета BNB упала на 70%, софт провел анализ и выдал сигнал на покупку автоматически.<br>Покупки всегда совершаются на локальных минимумах,<br>за счёт чего мы получаем более верный сигнал.",
+            example2_title: "Софт защищает от<br>эмоциональных решений",
+            example2_text: "Когда рынок резко падает или растёт, многие начинают паниковать<br>и совершают сделки на эмоциях. Алгоритм действует строго по расчёту —<br>он не реагирует на шум, а ждёт подтверждённые точки входа.<br>Это позволяет исключить человеческий фактор и увеличить точность сделок.",
+            example3_title: "Софт учитывает десятки<br>факторов за доли секунды",
+            example3_text: "Пока трейдер анализирует график вручную, софт уже обработал<br>данные по объёмам, волатильности, уровню поддержки и сопротивления.<br> Благодаря этому он мгновенно находит оптимальную точку входа с минимальным риском. <br>Это недоступно при ручной торговле.",
+            example_img1_alt: "График падения и отскока",
+            example_img2_alt: "Алгоритм без эмоций",
+            footer_logo_alt: "Логотип",
+            footer_about: "О проекте",
+            footer_cookies: "Политика файлов куки",
+            footer_terms: "Условия использования",
+            footer_privacy: "Политика конфиденциальности",
+            footer_copy: "© 2025 QOMEXTrading. Все права защищены.",
+            footer_support: "Support: qomexsupport@gmail.com"
+        },
+        en: {
+            header_about: "About",
+            header_risks: "Risk Types",
+            header_signals: "Signals",
+            header_instruction: "Instruction",
+            header_profile: "Profile",
+            header_register: "Register",
+            hero_title: "Software for <span>algorithmic <br> trading</span> on PocketOption",
+            hero_subtitle: "Receive signals based on mathematical models and boost your winrate.",
+            hero_signals_btn: "Signals",
+            hero_img_alt: "Profitability 150%",
+            hero_hand_alt: "Hand with phone",
+            bg_text: "QOMEX Trading",
+            advantages_title: "Benefits<br>of trading with software",
+            col_software: "Trading with software",
+            col_manual: "Manual trading",
+            row_speed: "Execution speed and efficiency",
+            tooltip_speed: "Automatic trade execution without delays",
+            row_emotions: "Exclusion of emotional factors",
+            tooltip_emotions: "System trades by algorithm, without emotions and impulses",
+            row_discipline: "Consistency and discipline",
+            tooltip_discipline: "Algorithm strictly follows trading strategy",
+            row_data: "Processing large volume of markets and data",
+            tooltip_data: "System analyzes dozens of signals per second",
+            row_income: "Predictable income",
+            tooltip_income: "Results depend on stable algorithms",
+            row_errors: "Reduced transactional and operational errors",
+            tooltip_errors: "Minimizes entry and exit mistakes",
+            about_label: "About",
+            about_title: "The software is suitable for beginners<br>in trading and crypto",
+            about_card1_title: "Profitability 5% – 30% monthly",
+            about_card1_text: "Profit ranges from 5% to 30% depending on your risks and volatility. We provide recommendations for reasonable risk.",
+            about_card2_title: "Trading on your account",
+            about_card2_text: "You get software and instructions, connect your account and choose settings. Simple and secure.",
+            about_card3_title: "Automatic matching of pairs",
+            about_card3_text: "You get a pair automatically that is declining or growing, and the software will withdraw it in a short period of time using high-frequency trading.",
+            about_card4_title: "Clear functionality without errors",
+            about_card4_text: "We made the interface as clear as possible. Detailed user manual included.",
+            about_card5_title: "Community of like-minded people",
+            about_card5_text: "You can join the chat to discuss strategy and support. We also give signals to maximize profits with our software.",
+            signals_btn: "Signals",
+            video_title: "Watch<br>a short video<br>and learn more",
+            feature_label: "Main feature",
+            feature_title: "Software analyzes the market<br>so its signals are 99.97% accurate",
+            feature_desc: "We developed this tech ourselves and use it in trading.<br>That’s why the software is getting more popular daily.",
+            example_label: "Example",
+            example1_title: "Software constantly evaluates<br>sudden price drops",
+            example1_text: "The BNB coin dropped by 70%, the software performed an analysis and issued a buy signal automatically.<br>Purchases are always made at local lows,<br>due to which we get a more accurate signal.",
+            example2_title: "Software protects from<br>emotional decisions",
+            example2_text: "When market moves sharply, many panic<br>and make emotional trades. Algorithm acts only by calculation —<br>ignores noise and waits for confirmed entry points.<br>This excludes human factor and increases accuracy.",
+            example3_title: "Software considers dozens<br>of factors in split seconds",
+            example3_text: "While trader analyzes chart manually, software already processed<br>data on volume, volatility, support and resistance.<br>This gives instant optimal entry point with minimal risk.<br>Impossible in manual trading.",
+            example_img1_alt: "Drop and bounce chart",
+            example_img2_alt: "Emotionless algorithm",
+            footer_logo_alt: "Logo",
+            footer_about: "About project",
+            footer_cookies: "Cookie Policy",
+            footer_terms: "Terms of Use",
+            footer_privacy: "Privacy Policy",
+            footer_copy: "© 2025 QOMEXTrading. All rights reserved.",
+            footer_support: "Support: qomexsupport@gmail.com"
+        },
+        ua: {
+            header_about: "Про софт",
+            header_risks: "Види ризику",
+            header_signals: "Сигнали",
+            header_instruction: "Інструкція",
+            header_profile: "Профіль",
+            header_register: "Зареєструватися",
+            hero_title: "Софт для <span>алгоритмічної <br> торгівлі</span> на PocketOption",
+            hero_subtitle: "Отримуйте сигнали на основі математичних моделей та підвищуйте свій вінрейт.",
+            hero_signals_btn: "Сигнали",
+            hero_img_alt: "Прибутковість 150%",
+            hero_hand_alt: "Рука з телефоном",
+            bg_text: "QOMEX Trading",
+            advantages_title: "Переваги<br>торгівлі з софтом",
+            col_software: "Трейдинг за допомогою софту",
+            col_manual: "Ручна торгівля",
+            row_speed: "Швидкість виконання та ефективність",
+            tooltip_speed: "Автоматичне виконання угод без затримок",
+            row_emotions: "Виключення емоційного фактора",
+            tooltip_emotions: "Система торгує за алгоритмом, без емоцій та імпульсів",
+            row_discipline: "Послідовність та дисципліна",
+            tooltip_discipline: "Алгоритм суворо дотримується стратегії",
+            row_data: "Обробка великого обсягу ринків та даних",
+            tooltip_data: "Система аналізує десятки сигналів за секунди",
+            row_income: "Прогнозований дохід",
+            tooltip_income: "Результати залежать від стабільних алгоритмів",
+            row_errors: "Зменшення помилок при угодах",
+            tooltip_errors: "Мінімізуються помилки при вході та виході з угод",
+            about_label: "Про софт",
+            about_title: "Софт підходить для новачків<br>у трейдингу та крипті",
+            about_card1_title: "Прибутковість 5% – 30% на місяць",
+            about_card1_text: "Прибутковість від 5% до 30% залежно від ваших ризиків та волатильності. Ми надаємо поради щодо розумного ризику.",
+            about_card2_title: "Торгівля на вашому акаунті",
+            about_card2_text: "Ви отримуєте ПО та інструкції, підключаєте рахунок і вибираєте налаштування. Все просто і безпечно.",
+            about_card3_title: "Автоматичне зіставлення пар",
+            about_card3_text: "Ви автоматично отримуєте пару, яка знижується або зростає, і програмне забезпечення виводить її протягом короткого періоду часу, використовуючи високочастотну торгівлю.",
+            about_card4_title: "Зрозумілий функціонал без помилок",
+            about_card4_text: "Ми зробили інтерфейс максимально зрозумілим. Додано докладну інструкцію.",
+            about_card5_title: "Спільнота однодумців",
+            about_card5_text: "Ви можете приєднатися до чату, щоб обговорити стратегію та підтримку. Ми також надаємо сигнали для отримання максимального прибутку за допомогою нашого програмного забезпечення.",
+            signals_btn: "Сигнали",
+            video_title: "Подивіться<br>коротке відео<br>і дізнайтесь більше",
+            feature_label: "Головна фішка",
+            feature_title: "Софт аналізує ринок<br>і його сигнали точні на 99.97%",
+            feature_desc: "Цю технологію ми розробили самостійно та застосовуємо у торгівлі.<br>Завдяки цьому софт стає дедалі популярнішим.",
+            example_label: "Приклад",
+            example1_title: "Софт постійно оцінює<br>різке падіння ціни",
+            example1_text: "Монета BNB впала на 70%, софт провів аналіз і видав сигнал на покупку автоматично.<br>Покупки завжди відбуваються на локальних мінімумах, < br > за рахунок чого ми отримуємо більш вірний сигнал.",
+            example2_title: "Софт захищає від<br>емоційних рішень",
+            example2_text: "Коли ринок різко падає чи зростає, багато хто панікує<br>і здійснює угоди на емоціях. Алгоритм діє лише за розрахунком —<br>не реагує на шум, а чекає підтверджених точок входу.<br>Це дозволяє виключити людський фактор і підвищити точність.",
+            example3_title: "Софт враховує десятки<br>факторів за частки секунди",
+            example3_text: "Поки трейдер аналізує графік вручну, софт вже обробив<br>дані по обсягам, волатильності, підтримці та опору.<br>Завдяки цьому він миттєво знаходить оптимальну точку входу з мінімальним ризиком.<br>Це недоступно у ручній торгівлі.",
+            example_img1_alt: "Графік падіння і відскоку",
+            example_img2_alt: "Алгоритм без емоцій",
+            footer_logo_alt: "Логотип",
+            footer_about: "Про проєкт",
+            footer_cookies: "Політика куки",
+            footer_terms: "Умови використання",
+            footer_privacy: "Політика конфіденційності",
+            footer_copy: "© 2025 QOMEXTrading. Всі права захищені.",
+            footer_support: "Підтримка: qomexsupport@gmail.com"
+        }
+    };
 
-  let currentLang = localStorage.getItem("lang") || "en";
+    let currentLang = localStorage.getItem("lang") || "en";
 
-  function applyTranslations() {
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      const translated = translations[currentLang]?.[key];
-      if (translated) {
-        el.innerHTML = translated;
-      }
+    function applyTranslations() {
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
+            const translated = translations[currentLang]?.[key];
+            if (translated) {
+                el.innerHTML = translated;
+            }
+        });
+
+        // Обновление стиля флагов
+        document.querySelectorAll("[data-lang]").forEach(flag => {
+            if (flag.getAttribute("data-lang") === currentLang) {
+                flag.classList.add("active-lang");
+            } else {
+                flag.classList.remove("active-lang");
+            }
+        });
+    }
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem("lang", lang);
+        applyTranslations();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        applyTranslations();
+        document.querySelectorAll("[data-lang]").forEach(flag => {
+            flag.addEventListener("click", () => {
+                setLanguage(flag.getAttribute("data-lang"));
+            });
+        });
     });
-
-    // Обновление стиля флагов
-    document.querySelectorAll("[data-lang]").forEach(flag => {
-      if (flag.getAttribute("data-lang") === currentLang) {
-        flag.classList.add("active-lang");
-      } else {
-        flag.classList.remove("active-lang");
-      }
-    });
-  }
-
-  function setLanguage(lang) {
-    currentLang = lang;
-    localStorage.setItem("lang", lang);
-    applyTranslations();
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    applyTranslations();
-    document.querySelectorAll("[data-lang]").forEach(flag => {
-      flag.addEventListener("click", () => {
-        setLanguage(flag.getAttribute("data-lang"));
-      });
-    });
-  });
 </script>
 
 <style>
-  .active-lang {
-    opacity: 1 !important;
-    filter: drop-shadow(0 0 6px #fff);
-  }
+    .active-lang {
+        opacity: 1 !important;
+        filter: drop-shadow(0 0 6px #fff);
+    }
 
-  [data-lang] {
-    cursor: pointer;
-    opacity: 0.5;
-    transition: 0.3s;
-  }
+    [data-lang] {
+        cursor: pointer;
+        opacity: 0.5;
+        transition: 0.3s;
+    }
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const hash = window.location.hash;
-    if (hash) {
-      const target = document.querySelector(hash);
-      if (target) {
-        setTimeout(() => {
-          target.scrollIntoView({ behavior: "smooth" });
-        }, 100); // задержка нужна для отрисовки DOM
-      }
-    }
-  });
+    document.addEventListener("DOMContentLoaded", () => {
+        const hash = window.location.hash;
+        if (hash) {
+            const target = document.querySelector(hash);
+            if (target) {
+                setTimeout(() => {
+                    target.scrollIntoView({ behavior: "smooth" });
+                }, 100); // задержка нужна для отрисовки DOM
+            }
+        }
+    });
 </script>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-  const burger = document.getElementById("burger");
-  const mobileMenu = document.getElementById("mobileMenu");
-  const closeBtn = document.getElementById("closeMenu");
+    document.addEventListener('DOMContentLoaded', () => {
+        const burger = document.getElementById('burger');      // .burger-btn
+        const menu   = document.getElementById('mobileMenu');
+        const close  = document.getElementById('closeMenu');
 
-  burger.addEventListener("click", () => {
-    mobileMenu.classList.add("show");
-  });
+        // 1) Создаём/добираем бэкдроп
+        let backdrop = document.querySelector('.menu-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'menu-backdrop';
+            document.body.appendChild(backdrop);
+        }
 
-  closeBtn.addEventListener("click", () => {
-    mobileMenu.classList.remove("show");
-  });
-});
+        // 2) ВЫНЕСТИ МЕНЮ В BODY (если оно внутри header)
+        if (menu && menu.parentElement !== document.body) {
+            document.body.appendChild(menu);
+        }
 
+        const openMenu  = () => {
+            menu.classList.add('show');
+            backdrop.classList.add('show');
+            burger?.classList.add('active');
+            burger?.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        };
+        const closeMenu = () => {
+            menu.classList.remove('show');
+            backdrop.classList.remove('show');
+            burger?.classList.remove('active');
+            burger?.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        };
+
+        burger?.addEventListener('click', () => {
+            const opened = menu.classList.contains('show');
+            opened ? closeMenu() : openMenu();
+        });
+        close?.addEventListener('click', closeMenu);
+        backdrop.addEventListener('click', closeMenu);
+        menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+    });
 </script>
 
+
+
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const isMobile = window.innerWidth <= 768;
-    if (!isMobile) return;
+    document.addEventListener("DOMContentLoaded", () => {
+        const isMobile = window.innerWidth <= 768;
+        if (!isMobile) return;
 
-    const container = document.querySelector(".card-slider");
-    const track = container?.querySelector(".slider-track");
+        const container = document.querySelector(".card-slider");
+        const track = container?.querySelector(".slider-track");
 
-    if (!container || !track) return;
+        if (!container || !track) return;
 
-    let currentScroll = 0;
+        let currentScroll = 0;
 
-    const scrollStep = () => {
-      const card = track.querySelector(".info-card");
-      if (!card) return;
+        const scrollStep = () => {
+            const card = track.querySelector(".info-card");
+            if (!card) return;
 
-      const cardWidth = card.offsetWidth + 20; // 20px — gap
-      currentScroll += cardWidth;
+            const cardWidth = card.offsetWidth + 20; // 20px — gap
+            currentScroll += cardWidth;
 
-      if (currentScroll >= track.scrollWidth - container.clientWidth) {
-        currentScroll = 0;
-      }
+            if (currentScroll >= track.scrollWidth - container.clientWidth) {
+                currentScroll = 0;
+            }
 
-      container.scrollTo({
-        left: currentScroll,
-        behavior: "smooth"
-      });
-    };
+            container.scrollTo({
+                left: currentScroll,
+                behavior: "smooth"
+            });
+        };
 
-    setInterval(scrollStep, 3000); // каждые 3 секунды
-  });
+        setInterval(scrollStep, 3000); // каждые 3 секунды
+    });
 </script>
 
 
