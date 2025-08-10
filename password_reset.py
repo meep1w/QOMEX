@@ -119,27 +119,24 @@ async def password_reset_request(payload: dict, background: BackgroundTasks):
 
 @router.get("/auth/reset")
 async def reset_password_page(request: Request, token: str):
-    """
-    Страница смены пароля (форма). Шаблон должен POST-ить на /password-reset
-    с полями: token, new_password (FormData), что совпадает с твоим auth.py.
-    """
-    # Можно тут валидировать токен заранее (красиво показать "ссылка устарела")
-    # Если не хочешь преждевременных ошибок — пропусти проверку на этом этапе.
+    invalid = False
+    reason = None
+
     if SECRET_KEY and SALT and token:
         s = get_serializer()
         try:
-            # Просто проверим подпись и срок (кроме того, /password-reset дальше сверит по БД)
             s.loads(token, salt=SALT, max_age=RESET_TOKEN_MAX_AGE)
         except SignatureExpired:
-            # Можно отрисовать отдельный шаблон с сообщением "Ссылка устарела"
-            return templates.TemplateResponse(
-                "reset_password_expired.html",
-                {"request": request}
-            )
+            invalid = True
+            reason = "expired"
         except BadSignature:
-            return templates.TemplateResponse(
-                "reset_password_invalid.html",
-                {"request": request}
-            )
+            invalid = True
+            reason = "invalid"
 
-    return templates.TemplateResponse("reset_password.html", {"request": request, "token": token})
+    return templates.TemplateResponse(
+        "reset_password.html",
+        {"request": request, "token": token, "invalid": invalid, "reason": reason}
+    )
+
+
+

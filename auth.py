@@ -1,5 +1,5 @@
 # auth.py
-from fastapi import APIRouter, Request, Form, Body
+from fastapi import APIRouter, Request, Form
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
@@ -11,11 +11,12 @@ import os
 from sqlalchemy import exists
 
 from database import SessionLocal
-from models import User, PostbackLog  # PostbackLog нужен для attach_pending_postbacks ниже
+from models import User, PostbackLog  # для attach_pending_postbacks
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
+# === Пароли ===
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
@@ -24,14 +25,16 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
+# === Куки ===
 IS_SECURE_COOKIES = os.getenv("ENV", "dev") != "dev"  # True в проде
 SAMESITE_POLICY = "Lax"
 
+# === Вспомогательные ===
 def _ensure_click_id_in_cookie(request: Request) -> str:
     """Берём click_id из cookie, если нет — генерим новый"""
     cid = request.cookies.get("click_id")
     if not cid:
-        cid = secrets.token_urlsafe(8)  # короткий безопасный id (URL-safe)
+        cid = secrets.token_urlsafe(8)
     return cid
 
 def ensure_unique_click_id(db, cid: Optional[str]) -> str:
@@ -42,7 +45,6 @@ def ensure_unique_click_id(db, cid: Optional[str]) -> str:
         cid = secrets.token_urlsafe(8)
     return cid
 
-# --- подтягивание старых постбэков ---
 def attach_pending_postbacks(db, user: User):
     q = db.query(PostbackLog).filter(PostbackLog.processed == False)
     if user.click_id:
@@ -72,12 +74,12 @@ def attach_pending_postbacks(db, user: User):
     user.updated_at = datetime.utcnow()
     db.commit()
 
-
+# === Рендер формы ===
 @router.get("/auth")
 async def auth_form(request: Request):
     return templates.TemplateResponse("auth.html", {"request": request})
 
-
+# === Регистрация/логин ===
 @router.post("/auth")
 async def handle_auth(
     request: Request,
@@ -100,7 +102,6 @@ async def handle_auth(
             if email and db.query(User).filter(User.email == email).first():
                 return JSONResponse({"success": False, "message": "Этот email уже занят."})
 
-            # берём СВОБОДНЫЙ click_id (чтобы не упасть по UNIQUE)
             click_id_cookie = ensure_unique_click_id(db, raw_click_id)
             hashed_pw = hash_password(password)
 
@@ -116,7 +117,6 @@ async def handle_auth(
             db.commit()
             db.refresh(new_user)
 
-            # подтянем постбэки, если были
             attach_pending_postbacks(db, new_user)
 
             resp = JSONResponse({"success": True, "click_id": click_id_cookie})
@@ -125,7 +125,6 @@ async def handle_auth(
             if new_user.email:
                 resp.set_cookie("user_email", new_user.email, max_age=max_age,
                                 secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
-            # обновим куку на тот click_id, который точно свободен
             resp.set_cookie("click_id", click_id_cookie, max_age=60*60*24*30,
                             secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
             return resp
@@ -137,17 +136,15 @@ async def handle_auth(
 
             click_id_cookie = raw_click_id
 
-            # если у пользователя в БД пусто — выдадим ему свободный click_id
             if not user.click_id:
                 safe_cid = ensure_unique_click_id(db, click_id_cookie)
                 if safe_cid != click_id_cookie:
-                    click_id_cookie = safe_cid  # заменим куку ниже
+                    click_id_cookie = safe_cid
                 user.click_id = safe_cid
                 user.updated_at = datetime.utcnow()
                 db.commit()
                 db.refresh(user)
 
-            # подтянем постбэки
             attach_pending_postbacks(db, user)
 
             resp = JSONResponse({"success": True, "click_id": user.click_id or click_id_cookie})
@@ -156,7 +153,6 @@ async def handle_auth(
             if user.email:
                 resp.set_cookie("user_email", user.email, max_age=max_age,
                                 secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
-            # поддержим корректный click_id в куке
             resp.set_cookie("click_id", user.click_id or click_id_cookie, max_age=60*60*24*30,
                             secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY)
             return resp
@@ -167,26 +163,38 @@ async def handle_auth(
     finally:
         db.close()
 
-
+# === Сброс пароля (применение нового) ===
 @router.post("/password-reset")
 async def password_reset(
+    request: Request,
     token_form: Optional[str] = Form(None),
     new_password_form: Optional[str] = Form(None),
-    body: Optional[dict] = Body(None),
 ):
-    token = token_form or (body or {}).get("token")
-    new_password = new_password_form or (body or {}).get("new_password")
+    # 1) сначала пробуем form
+    token = token_form
+    new_password = new_password_form
 
+    # 2) если form пуст — читаем JSON вручную
     if not token or not new_password:
-        return JSONResponse({"success": False, "message": "Некорректные данные."})
-    if len(new_password) < 6:
-        return JSONResponse({"success": False, "message": "Пароль слишком короткий (мин. 6 символов)."})
+        try:
+            data = await request.json()
+        except Exception:
+            data = {}
+        token = token or data.get("token")
+        new_password = new_password or data.get("new_password")
 
+    # 3) валидация
+    if not token or not new_password:
+        return JSONResponse({"success": False, "message": "Некорректные данные."}, status_code=400)
+    if len(new_password) < 6:
+        return JSONResponse({"success": False, "message": "Пароль слишком короткий (мин. 6 символов)."}, status_code=400)
+
+    # 4) ищем по токену и обновляем пароль
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.reset_token == token).first()
         if not user:
-            return JSONResponse({"success": False, "message": "Неверный или устаревший токен."})
+            return JSONResponse({"success": False, "message": "Неверный или устаревший токен."}, status_code=400)
 
         user.password = hash_password(new_password)
         user.reset_token = None
