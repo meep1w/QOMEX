@@ -1087,3 +1087,28 @@ main, .page, .container, body > section:first-of-type,
 
     .nav, .header-right { display: none !important; }
 }
+
+/* === DESKTOP header layout: logo | nav(center) | button | languages === */
+@media (min-width: 993px) {
+    .header .container.header-inner,
+    .header-inner {
+        display: grid !important;
+        grid-template-columns: auto 1fr auto auto; /* logo | nav | btn | langs */
+        align-items: center;
+        column-gap: 24px;
+        height: 80px;
+    }
+
+    /* скрыть бургер на ПК */
+    .burger-btn { display: none !important; }
+
+    /* правильные позиции */
+    .logo-link        { grid-column: 1; justify-self: start !important; }
+    .nav              { grid-column: 2; justify-self: center; }
+    .header-right     { grid-column: 3; justify-self: end; }
+    .language-icons   { grid-column: 4; justify-self: end; }
+
+    /* чтобы меню не наползало при длинных пунктах */
+    .nav { gap: 28px; white-space: nowrap; }
+    .nav a { display: inline-block; }
+}
