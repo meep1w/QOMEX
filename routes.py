@@ -31,12 +31,24 @@ async def terms(request: Request):
 async def privacy(request: Request):
     return templates.TemplateResponse("privacy.html", {"request": request})
 
+
+def _delete_auth_cookies(resp: RedirectResponse):
+    # удаляем с теми же атрибутами и path="/"
+    for name in ["user_id", "user_email", "click_id"]:
+        resp.delete_cookie(name, secure=IS_SECURE_COOKIES, samesite=SAMESITE_POLICY, path="/")
+
 @router.post("/logout")
-async def logout():
+async def logout_post():
     resp = RedirectResponse("/", status_code=303)
-    resp.delete_cookie("user_id")
-    resp.delete_cookie("user_email")
+    _delete_auth_cookies(resp)
     return resp
+
+@router.get("/logout")
+async def logout_get():
+    resp = RedirectResponse("/", status_code=303)
+    _delete_auth_cookies(resp)
+    return resp
+
 
 # ---------- Переход на брокера ----------
 
