@@ -311,12 +311,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Сабмит формы сброса пароля (без писем — редирект по reset_url)
   if (passwordResetForm) {
     passwordResetForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (resetMessage) resetMessage.textContent = "";
+      if (resetMessage) {
+        resetMessage.textContent = "";
+        resetMessage.style.color = "";
+      }
       const emailEl = document.getElementById("reset-email");
       const email = (emailEl?.value || "").trim();
+      if (!email) {
+        if (resetMessage) {
+          resetMessage.style.color = "red";
+          resetMessage.textContent = t.auth_email_placeholder || "Введите email";
+        }
+        return;
+      }
 
       try {
         const res = await fetch("/password-reset-request", {
@@ -326,7 +337,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const data = await res.json().catch(() => ({}));
-        const ok = data.ok === true || data.success === true;
+        const ok = data.success === true || data.ok === true;
+
+        // если пришёл reset_url — сразу редиректим на форму смены пароля
+        if (ok && data.reset_url) {
+          window.location.href = data.reset_url;
+          return;
+        }
 
         if (resetMessage) {
           resetMessage.style.color = ok ? "green" : "red";
@@ -341,7 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch {
         if (resetMessage) {
           resetMessage.style.color = "red";
-          resetMessage.textContent = t.auth_server_error;
+          resetMessage.textContent = t.auth_server_error || "Ошибка сервера. Попробуйте позже.";
         }
       }
     });

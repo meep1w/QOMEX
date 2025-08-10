@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 from typing import Optional
 
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
+from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 
@@ -14,12 +14,14 @@ from dotenv import load_dotenv
 from database import SessionLocal
 from models import User
 
+# Загружаем .env (в main.py ты уже делаешь load_dotenv с явным путём — тут не мешает)
 load_dotenv()
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 log = logging.getLogger("password_reset")
 
+# --- SMTP (оставлено на будущее, отправка ниже отключена) ---
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USERNAME = os.getenv("SMTP_USERNAME")
@@ -28,8 +30,9 @@ SMTP_FROM = os.getenv("SMTP_FROM", SMTP_USERNAME)
 SMTP_USE_TLS = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
 SMTP_USE_SSL = os.getenv("SMTP_USE_SSL", "false").lower() == "true"
 
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
-RESET_TOKEN_MAX_AGE = int(os.getenv("RESET_TOKEN_MAX_AGE", "3600"))  # 1 час по умолчанию
+# --- Базовые настройки ---
+BASE_URL = os.getenv("BASE_URL") or "https://qomex.top"  # НЕ localhost по умолчанию
+RESET_TOKEN_MAX_AGE = int(os.getenv("RESET_TOKEN_MAX_AGE", "3600"))  # сек
 SECRET_KEY = os.getenv("SECRET_KEY")
 SALT = os.getenv("SECURITY_PASSWORD_SALT")
 
@@ -48,13 +51,16 @@ def _send_email_smtp(to_email: str, subject: str, html_body: str):
     msg["To"] = to_email
 
     if SMTP_USE_SSL:
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=20) as server:
+            server.ehlo()
             server.login(SMTP_USERNAME, SMTP_PASSWORD)
             server.sendmail(SMTP_FROM, [to_email], msg.as_string())
     else:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=20) as server:
+            server.ehlo()
             if SMTP_USE_TLS:
                 server.starttls()
+                server.ehlo()
             server.login(SMTP_USERNAME, SMTP_PASSWORD)
             server.sendmail(SMTP_FROM, [to_email], msg.as_string())
 
@@ -67,58 +73,61 @@ def send_password_reset_email(email: str, token: str):
         <p><a href="{reset_url}">{reset_url}</a></p>
         <p>Ссылка действительна {RESET_TOKEN_MAX_AGE // 60} минут(ы).</p>
     """
-
-    # 1) логируем ссылку (удобно в dev)
+    # лог для отладки
     log.warning("Password reset link for %s: %s", email, reset_url)
 
-    # 2) пытаемся отправить письмо
+    # ОТПРАВКА ВЫКЛЮЧЕНА (порты блокируются). Включишь позже — просто раскомментируй.
     try:
-        _send_email_smtp(email, subject, body)
-        log.info("Password reset email sent to %s", email)
+        # _send_email_smtp(email, subject, body)
+        # log.info("Password reset email sent to %s", email)
+        pass
     except Exception as e:
         log.exception("SMTP send failed: %s", e)
-        # В ответ пользователю всё равно вернём success, чтобы не палить существование email.
-
+        # Ответ пользователю всё равно будет success.
 
 @router.post("/password-reset-request")
 async def password_reset_request(payload: dict, background: BackgroundTasks):
     """
     Принимает JSON: {"email": "..."}
-    Если пользователь существует — генерирует токен, сохраняет в БД и отправляет письмо.
-    В ответе всегда success=True (не палим существование email).
+    Если пользователь существует — генерирует токен, сохраняет в БД и (опционально) отправляет письмо.
+    Сейчас возвращаем reset_url напрямую, чтобы обойтись без писем.
     """
     email = (payload.get("email") or "").strip().lower()
     if not email:
-        return JSONResponse({"success": False, "message": "Укажите email."})
+        return JSONResponse({"success": False, "message": "Укажите email."}, status_code=400)
 
     db = SessionLocal()
     try:
+        reset_url_out = None
+
         user: Optional[User] = db.query(User).filter(User.email == email).first()
-        if user:
-            if not SALT:
-                log.error("SECURITY_PASSWORD_SALT not set")
-                # Всё равно отвечаем success, но логируем проблему
-            else:
-                # генерим токен с TTL (проверим TTL при смене пароля, если решишь валидировать через serializer)
-                s = get_serializer()
-                token = s.dumps(email, salt=SALT)
+        if user and SALT:
+            s = get_serializer()
+            token = s.dumps(email, salt=SALT)
 
-                # сохраняем токен в БД (под твой /password-reset из auth.py)
-                user.reset_token = token
-                user.updated_at = datetime.utcnow()
-                db.commit()
+            user.reset_token = token
+            user.updated_at = datetime.utcnow()
+            db.commit()
 
-                # письмо отправим в фоне
-                background.add_task(send_password_reset_email, email, token)
+            # Отправку письма можно включить позже:
+            # background.add_task(send_password_reset_email, email, token)
 
-        # Всегда успешный ответ
-        return JSONResponse({"success": True, "message": "Если email существует, ссылка отправлена."})
+            reset_url_out = f"{BASE_URL}/auth/reset?token={token}"
+            log.warning("Password reset link for %s: %s", email, reset_url_out)
+
+        # Всегда success (не палим наличие email), но если юзер найден — вернём reset_url
+        resp = {"success": True, "message": "Если email существует, ссылка отправлена."}
+        if reset_url_out:
+            resp["reset_url"] = reset_url_out
+        return JSONResponse(resp)
     finally:
         db.close()
 
-
 @router.get("/auth/reset")
 async def reset_password_page(request: Request, token: str):
+    """
+    Отрисовываем форму смены пароля. Если токен невалиден/просрочен — покажем предупреждение в этом же шаблоне.
+    """
     invalid = False
     reason = None
 
@@ -137,6 +146,3 @@ async def reset_password_page(request: Request, token: str):
         "reset_password.html",
         {"request": request, "token": token, "invalid": invalid, "reason": reason}
     )
-
-
-
