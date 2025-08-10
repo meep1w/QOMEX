@@ -119,25 +119,28 @@
     Вы получите ссылку для сброса пароля.
   </p>
 
-  <form id="profile-password-reset-form" class="form-grid" style="max-width:460px;">
-    <label for="profile-reset-email" data-i18n="your_email">Ваша почта</label>
-    <input
-      type="email"
-      id="profile-reset-email"
-      name="email"
-      value="{{ user.email }}"
-      placeholder="user@example.com"
-      required
-      style="width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#111;color:#fff"
-    />
+  <form id="profile-password-reset-form" class="form-grid">
+    <div class="form-column">
+      <label for="profile-reset-email" data-i18n="your_email">Ваша почта</label>
+      <input
+        type="email"
+        id="profile-reset-email"
+        name="email"
+        value="{{ user.email }}"
+        placeholder="user@example.com"
+        data-i18n-placeholder="auth_email_placeholder"
+        required
+      />
+    </div>
 
-    <button type="submit" class="save-btn" style="margin-top:12px;" data-i18n="send_link">
-      Отправить ссылку
-    </button>
+    <div class="button-container">
+      <button type="submit" class="save-btn" data-i18n="send_link">Отправить ссылку</button>
+    </div>
 
     <div id="profile-reset-msg" style="display:none;margin-top:8px;color:#bbb;"></div>
   </form>
 </div>
+
 
 
     <div class="tab-content" id="referral">
