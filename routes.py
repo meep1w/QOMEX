@@ -63,28 +63,37 @@ def go_broker(request: Request):
 
 
 # --- SEO: robots.txt & sitemap.xml ---
-from fastapi.responses import PlainTextResponse, Response
-import os as _os
-from xml.etree.ElementTree import Element, SubElement, tostring  # <-- добавили
+from fastapi import Request
+from fastapi.responses import (
+    PlainTextResponse,
+    HTMLResponse,
+    RedirectResponse,
+    Response,
+)
+from xml.etree.ElementTree import Element, SubElement, tostring
 
-BASE_URL = _os.getenv("BASE_URL", "https://qomex.top")
-
+# ---------- robots.txt ----------
 @router.get("/robots.txt", response_class=PlainTextResponse)
 def robots():
-    return f"""User-agent: *
+    body = f"""User-agent: *
 Allow: /
 Disallow: /profile
 Disallow: /auth/reset
 Sitemap: {BASE_URL}/sitemap.xml
 """.strip()
+    return PlainTextResponse(
+        body,
+        media_type="text/plain; charset=utf-8",
+        headers={"Cache-Control": "no-store"},
+    )
 
+# ---------- sitemap.xml ----------
 @router.get("/sitemap.xml")
 def sitemap():
     urls = [
         "/", "/auth", "/signals",
         "/privacy.html", "/terms.html", "/cookie.html",
     ]
-
     urlset = Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
     for path in urls:
         url = SubElement(urlset, "url")
@@ -92,15 +101,23 @@ def sitemap():
         loc.text = f"{BASE_URL}{path}"
 
     xml = '<?xml version="1.0" encoding="UTF-8"?>' + tostring(urlset, encoding="unicode")
-    return Response(content=xml, media_type="application/xml")
+    return Response(
+        content=xml,
+        media_type="application/xml",
+        headers={"Cache-Control": "no-store"},
+    )
 
-from fastapi.responses import HTMLResponse, RedirectResponse
+# HEAD для sitemap (чтобы не было 405 на HEAD)
+@router.head("/sitemap.xml")
+def sitemap_head():
+    return Response(status_code=200, media_type="application/xml")
 
+# ---------- Страница /signals и редирект со старого пути ----------
 @router.get("/signals", response_class=HTMLResponse)
 def signals_page(request: Request):
     return templates.TemplateResponse("signals.html", {"request": request})
 
-# Постоянный редирект со старого пути (если он где-то используется)
 @router.get("/go-to-signals")
 def go_to_signals():
     return RedirectResponse("/signals", status_code=301)
+
