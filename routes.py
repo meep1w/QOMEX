@@ -142,3 +142,23 @@ from datetime import datetime
 def diag_text():
     # отдадим голый текст без HTML/JS/CSS
     return f"OK {datetime.utcnow().isoformat()}Z"
+
+from fastapi.responses import HTMLResponse
+from datetime import datetime
+
+@router.get("/diag-html", response_class=HTMLResponse)
+def diag_html():
+    return f"""<!doctype html>
+<meta charset="utf-8">
+<title>diag html</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html,body{{height:100%}}
+  body{{margin:0;background:#ff0040;color:#fff;font:24px/1.5 -apple-system,system-ui,Segoe UI,Roboto;padding:24px}}
+  .box{{background:#111;padding:16px;border-radius:12px}}
+</style>
+<h1>Диагностика HTML</h1>
+<div class="box">
+  <p>Если ты это видишь — рендер HTML на телефоне работает.</p>
+  <p>UTC: {datetime.utcnow().isoformat()}Z</p>
+</div>"""
