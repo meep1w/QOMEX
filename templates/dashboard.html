@@ -836,6 +836,7 @@
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
+  // ====== ДАННЫЕ ПАР И СИМВОЛОВ ======
   const pairs = [
     'EUR/USD','GBP/USD','USD/JPY','USD/CHF','USD/CAD',
     'AUD/USD','NZD/USD','EUR/GBP','EUR/JPY','GBP/JPY',
@@ -855,6 +856,7 @@
     'BNB/USDT':'BINANCE:BNBUSDT','SOL/USDT':'BINANCE:SOLUSDT','TRX/USDT':'BINANCE:TRXUSDT'
   };
 
+  // маппинг кодов коду страны/крипто-иконок
   const flagMap = {
     'USD':'us','EUR':'eu','GBP':'gb','JPY':'jp','CHF':'ch',
     'CAD':'ca','AUD':'au','NZD':'nz',
@@ -864,13 +866,16 @@
 
   let currentPair = 'BTC/USDT';
 
+  // ====== TV WIDGET ======
   function renderChart(symbol) {
-    document.getElementById('tradingview_chart').innerHTML = '';
+    const container = document.getElementById('tradingview_chart');
+    if (!container) return;
+    container.innerHTML = '';
     new TradingView.widget({
       container_id: "tradingview_chart",
       width: '100%',
       height: 500,
-      symbol: symbol,
+      symbol,
       interval: "1",
       timezone: "Etc/UTC",
       theme: "dark",
@@ -883,35 +888,38 @@
     });
   }
 
-  // -------- Флаги: надёжные источники + fallback --------
+  // ====== ФЛАГИ (надёжные URL + фолбэки) ======
   function getFlagURL(code) {
     const cc = flagMap[code];
     if (!cc) return '';
 
+    // крипто-иконки
     const crypto = ['btc','eth','xrp','ltc','ada','doge','bnb','sol','trx','usdt'];
     if (crypto.includes(cc)) {
       return `https://assets.coincap.io/assets/icons/${cc}@2x.png`;
     }
-    // форекс-флаги — flagcdn (поддерживает EU)
-    return `https://flagcdn.com/${cc}.svg`;  // нижний регистр
+    // форекс — PNG (устойчивее, чем SVG). Можно w20/w40/w80
+    return `https://flagcdn.com/w40/${cc}.png`;
   }
 
   function setFlag(imgEl, url, code) {
-    const cc = flagMap[code];
-    const fallback = cc
-      ? `https://cdn.jsdelivr.net/npm/country-flag-icons/3x2/${cc.toUpperCase()}.svg`
-      : '';
+    // перестраховка от блокировок по рефереру
+    imgEl.referrerPolicy = 'no-referrer';
 
+    const cc = (flagMap[code] || '').toUpperCase();
+    const fallback1 = cc ? `https://cdn.jsdelivr.net/npm/country-flag-icons/3x2/${cc}.svg` : '';
+    const fallback2 = cc ? `https://unpkg.com/country-flag-icons/3x2/${cc}.svg` : '';
+
+    let step = 0;
     imgEl.onerror = () => {
-      if (fallback && imgEl.dataset.fallback !== '1') {
-        imgEl.dataset.fallback = '1';
-        imgEl.src = fallback;
-      } else {
-        imgEl.style.visibility = 'hidden';
-      }
+      step++;
+      if (step === 1 && fallback1) imgEl.src = fallback1;
+      else if (step === 2 && fallback2) imgEl.src = fallback2;
+      else imgEl.style.visibility = 'hidden';
     };
-    imgEl.src = url;
+
     imgEl.style.visibility = 'visible';
+    imgEl.src = url;
   }
 
   function updateFlags(pair) {
@@ -924,9 +932,11 @@
     setFlag(f2, getFlagURL(quote), quote);
   }
 
+  // ====== КНОПКА "Получить сигнал" ======
   function resetSignal() {
     const randomIndex = Math.floor(Math.random() * pairs.length);
     currentPair = pairs[randomIndex];
+
     document.getElementById('pair').textContent = currentPair;
     updateFlags(currentPair);
 
@@ -946,7 +956,18 @@
 
     renderChart(tvSymbols[currentPair]);
   }
+
+  // ====== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ======
+  document.addEventListener('DOMContentLoaded', () => {
+    // выставим стартовую пару
+    const pairEl = document.getElementById('pair');
+    if (pairEl) pairEl.textContent = currentPair;
+
+    updateFlags(currentPair);
+    renderChart(tvSymbols[currentPair]);
+  });
 </script>
+
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
