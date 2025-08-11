@@ -948,6 +948,16 @@
   }
 </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // отрисуем стартовую пару и флаги при загрузке
+    document.getElementById('pair').textContent = currentPair;
+    updateFlags(currentPair);
+    renderChart(tvSymbols[currentPair]);
+  });
+</script>
+
+
 
 <script>
     const translations = {
