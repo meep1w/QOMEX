@@ -134,3 +134,11 @@ def signals_page(request: Request):
 @router.get("/go-to-signals")
 def go_to_signals():
     return RedirectResponse("/signals", status_code=301)
+
+from fastapi.responses import PlainTextResponse
+from datetime import datetime
+
+@router.get("/diag.txt", response_class=PlainTextResponse)
+def diag_text():
+    # отдадим голый текст без HTML/JS/CSS
+    return f"OK {datetime.utcnow().isoformat()}Z"
